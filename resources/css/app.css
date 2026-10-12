@@ -12,23 +12,18 @@
  * Para cambiar un color en todo el sistema, se cambia aquí y en ningún otro lugar.
  */
 @theme {
-    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+       --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Acentos */
-    --color-brand-terracotta: #D85A38;       /* precios, énfasis, badges de oferta, enlaces activos */
+    --color-brand-terracotta: #D85A38;
     --color-brand-terracottaHover: #BF4B2B;
-    --color-brand-teal: #1D5A68;             /* carrito, avisos del sistema, banners, badges de estado */
+    --color-brand-teal: #1D5A68;
     --color-brand-tealHover: #14434E;
-
-    /* Oscuro principal */
-    --color-brand-dark: #2A2421;             /* títulos, texto, botón de acción principal */
+    --color-brand-dark: #2A2421;
     --color-brand-darkHover: #1A1614;
-
-    /* Beiges */
-    --color-brand-beigeBg: #F3EFEA;          /* fondo general (body) */
-    --color-brand-beigeCard: #FAF8F5;        /* fondo del marco móvil (main) */
-    --color-brand-beigeBorder: #E5DDD3;      /* bordes y líneas divisorias */
-    --color-brand-beigeInput: #F0EAE1;       /* campos de formulario, buscador, placeholders de imagen */
+    --color-brand-beigeBg: #F3EFEA;
+    --color-brand-beigeCard: #FAF8F5;
+    --color-brand-beigeBorder: #E5DDD3;
+    --color-brand-beigeInput: #F0EAE1;
 }
 
 /* Oculta la barra de scroll en carruseles y pestañas horizontales */

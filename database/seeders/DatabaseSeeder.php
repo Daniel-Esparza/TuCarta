@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +15,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+<<<<<<< HEAD
             RestaurantesSeeder::class,
+=======
+            NucleoSeeder::class,
+>>>>>>> origin/feature/US-32-migraciones-nucleo
         ]);
 
     }
