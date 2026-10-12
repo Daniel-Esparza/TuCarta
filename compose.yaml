@@ -48,6 +48,21 @@ services:
                 - '${DB_USERNAME}'
             retries: 3
             timeout: 5s
+    traefik:
+        image: 'traefik:v3.1'
+        profiles:
+            - https
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+            - './docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro'
+            - './docker/traefik/dinamico.yml:/etc/traefik/dinamico.yml:ro'
+            - './docker/certs:/certs:ro'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
 networks:
     sail:
         driver: bridge

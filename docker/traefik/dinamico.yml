@@ -1,0 +1,29 @@
+# Configuración dinámica de Traefik.
+# Cualquier dominio o subdominio que llegue se manda a Laravel, así que un
+# negocio nuevo funciona sin tocar nada aquí. El certificado lo genera
+# docker/certs/generar-certificado.sh.
+
+http:
+  routers:
+    tucarta:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - websecure
+      service: laravel
+      tls: {}
+
+  services:
+    laravel:
+      loadBalancer:
+        servers:
+          - url: "http://laravel.test:80"
+
+tls:
+  certificates:
+    - certFile: /certs/tucarta.pem
+      keyFile: /certs/tucarta-key.pem
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/tucarta.pem
+        keyFile: /certs/tucarta-key.pem
