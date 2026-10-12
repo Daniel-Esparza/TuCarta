@@ -19,9 +19,5 @@ class DatabaseSeeder extends Seeder
             RestaurantesSeeder::class,
         ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
     }
 }
