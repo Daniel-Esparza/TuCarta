@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('horarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('negocio_id')->constrained('restaurantes')->cascadeOnDelete();
+            $table->foreignId('negocio_id')->constrained('negocios')->cascadeOnDelete();
             $table->tinyInteger('dia_semana');   
             $table->time('hora_apertura');
             $table->time('hora_cierre');

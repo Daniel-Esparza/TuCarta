@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('negocio_id')->constrained('restaurantes')->cascadeOnDelete();
+            $table->foreignId('negocio_id')->constrained('negocios')->cascadeOnDelete();
             $table->string('nombre', 80);
             $table->integer('orden')->default(0);
             $table->boolean('activo')->default(true);

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('grupos_opciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('platillo_id')->constrained('platillos')->cascadeOnDelete();
+            $table->foreignId('item_id')->constrained('items')->cascadeOnDelete();
             $table->string('nombre', 100);
             $table->boolean('es_multiple')->default(false);
             $table->boolean('es_obligatorio')->default(false);
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('orden')->default(0);
             $table->timestamps();
 
-            $table->index(['platillo_id', 'orden']);
+            $table->index(['item_id', 'orden']);
         });
     }
 

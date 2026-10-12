@@ -13,7 +13,7 @@ class Categoria extends Model
         return $this->belongsTo(Restaurante::class, 'negocio_id');
     }
 
-    public function platillos()
+    public function items()
     {
         return $this->hasMany(Platillo::class)->orderBy('nombre');
     }

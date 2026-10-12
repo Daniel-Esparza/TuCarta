@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('platillos', function (Blueprint $table) {
+        Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('categoria_id')->constrained('categorias')->restrictOnDelete();
             $table->string('nombre', 120);
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('platillos');
+        Schema::dropIfExists('items');
     }
 };
