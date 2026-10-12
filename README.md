@@ -1,58 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TuCarta
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plataforma de catálogos digitales para restaurantes y negocios pequeños: cada negocio tiene su menú en su propia dirección web y recibe los pedidos por WhatsApp. TuCarta no cobra ni procesa pagos.
 
-## About Laravel
+Proyecto de la materia Arquitectura Avanzada de Aplicaciones Web (UTSLP).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Laravel 13 (Blade, Eloquent) con Laravel Sail (Docker)
+- PHP 8.5 (el que usa la imagen de Sail del proyecto)
+- PostgreSQL 16
+- Tailwind CSS, Alpine.js y Vite
+- Pruebas con Pest/PHPUnit y GitHub Actions
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requisitos
 
-## Learning Laravel
+- Git
+- Docker y Docker Compose
+- En Windows: WSL2 con Docker Desktop (ejecuta todos los comandos dentro de WSL)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+No hace falta instalar PHP, Composer ni PostgreSQL en tu computadora.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalación
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+1. Clona el repositorio y entra a la carpeta:
 
-## Agentic Development
+   ```bash
+   git clone https://github.com/Daniel-Esparza/TuCarta.git
+   cd TuCarta
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+2. Copia el archivo de configuración:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Instala las dependencias de PHP usando Docker:
+
+   ```bash
+   docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/app" -w /app composer:latest composer install --ignore-platform-reqs
+   ```
+
+4. Levanta los contenedores (la primera vez tarda unos minutos):
+
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
+
+5. Genera la llave de la aplicación y crea la base de datos con datos de prueba:
+
+   ```bash
+   ./vendor/bin/sail artisan key:generate
+   ./vendor/bin/sail artisan migrate --seed
+   ```
+
+6. Instala y compila los archivos de interfaz:
+
+   ```bash
+   ./vendor/bin/sail npm install
+   ./vendor/bin/sail npm run dev
+   ```
+
+7. Abre http://localhost en el navegador.
+
+Si el puerto 80 de tu computadora está ocupado, agrega `APP_PORT=8080` en tu `.env` y abre http://localhost:8080.
+
+## Comandos útiles
+
+| Qué quieres hacer | Comando |
+|---|---|
+| Levantar el proyecto | `./vendor/bin/sail up -d` |
+| Apagarlo | `./vendor/bin/sail down` |
+| Recrear la base con datos de prueba | `./vendor/bin/sail artisan migrate:fresh --seed` |
+| Correr las pruebas | `./vendor/bin/sail artisan test` |
+| Abrir una terminal dentro del contenedor | `./vendor/bin/sail shell` |
+
+Tip: puedes crear un alias `sail` con `alias sail='./vendor/bin/sail'`.
+
+## Flujo de trabajo con Git (Git Flow)
+
+- `main`: versión estable, lo que se entrega.
+- `dev`: rama de integración, donde se juntan todas las historias.
+- `feature/US-XX-descripcion-corta`: una rama por historia de usuario, siempre creada desde `dev`.
+
+Reglas:
+
+1. Nadie sube directo a `main` ni a `dev`.
+2. Cada rama `feature/*` entra a `dev` por Pull Request.
+3. Todo Pull Request necesita la revisión de otra persona del equipo (nadie revisa el suyo).
+4. Antes de pedir revisión: corre `migrate:fresh --seed` y `artisan test` en tu rama.
+5. Una historia está terminada cuando otra persona la probó y funciona en el servidor del equipo, no solo en tu computadora.
+
+Ejemplo:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git checkout dev
+git pull
+git checkout -b feature/US-32-migraciones-nucleo
+# ...trabajas, haces commits...
+git push -u origin feature/US-32-migraciones-nucleo
+# Después abres el Pull Request hacia dev en GitHub
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Servidor del equipo
 
-## Contributing
+La configuración del dominio interno y del HTTPS del servidor se documenta en `docs/servidor.md` 
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Equipo
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Camila Rodríguez Blanco (Scrum Master)
+- Daniel Esparza Carlos
+- Jacobo David Beltrán Reyes
+- Max Alejandro Campuzano Ávila
+- Sebastián Cruz Vázquez
