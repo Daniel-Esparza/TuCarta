@@ -8,7 +8,7 @@ class Opcion extends Model
 {
     protected $table = 'opciones';
 
-    protected $fillable = ['grupo_opcion_id', 'nombre', 'incremento_precio', 'orden'];
+    protected $fillable = ['grupo_opcion_id', 'nombre', 'incremento_precio', 'orden', 'negocio_id', 'imagen'];
 
     public function grupo()
     {

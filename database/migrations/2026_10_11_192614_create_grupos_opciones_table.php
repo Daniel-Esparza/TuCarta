@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('grupos_opciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained('items')->cascadeOnDelete();
+            $table->foreignId('negocio_id')->constrained('negocios')->cascadeOnDelete();
             $table->string('nombre', 100);
             $table->boolean('es_multiple')->default(false);
             $table->boolean('es_obligatorio')->default(false);

@@ -9,6 +9,7 @@ class item extends Model
     protected $fillable = [
         'categoria_id', 'nombre', 'descripcion', 'precio',
         'imagen', 'miniatura', 'disponible_hoy', 'activo',
+        'negocio_id'
     ];
 
     protected $casts = ['precio' => 'decimal:2'];

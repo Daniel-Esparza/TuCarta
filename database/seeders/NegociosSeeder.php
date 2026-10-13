@@ -40,18 +40,21 @@ class NegociosSeeder extends Seeder
 
         // items
         $margarita = $catPizzas->items()->create([
+            'negocio_id'  => $pizzeria->id,      
             'nombre'      => 'Pizza Margarita',
             'descripcion' => 'Salsa de tomate San Marzano, mozzarella fresca y albahaca.',
             'precio'      => 149.00,
         ]);
 
         $catPizzas->items()->create([
+            'negocio_id'  => $pizzeria->id,      
             'nombre'      => 'Pizza Pepperoni',
             'descripcion' => 'Doble pepperoni y queso mozzarella extra.',
             'precio'      => 179.00,
         ]);
 
         $catBebidas->items()->create([
+            'negocio_id'  => $pizzeria->id,      
             'nombre'      => 'Refresco 600 ml',
             'descripcion' => 'Coca-Cola, Sprite o Fanta.',
             'precio'      => 35.00,
@@ -59,6 +62,7 @@ class NegociosSeeder extends Seeder
 
         // Grupo de opciones 
         $tamano = $margarita->gruposOpciones()->create([
+            'negocio_id'       => $pizzeria->id,      
             'nombre'          => 'Tamaño',
             'es_multiple'     => false,   
             'es_obligatorio'  => true,    
@@ -68,16 +72,31 @@ class NegociosSeeder extends Seeder
         ]);
 
         $tamano->opciones()->createMany([
-            ['nombre' => 'Chica (8 rebanadas)',    'incremento_precio' => 0.00,  'orden' => 1],
-            ['nombre' => 'Mediana (12 rebanadas)', 'incremento_precio' => 45.00, 'orden' => 2],
-            ['nombre' => 'Grande (16 rebanadas)',  'incremento_precio' => 85.00, 'orden' => 3],
+            [
+                'negocio_id'       => $pizzeria->id,      
+                'nombre'           => 'Chica (8 rebanadas)',
+                'incremento_precio' => 0.00,
+                'orden'            => 1,
+            ],
+            [
+                'negocio_id'       => $pizzeria->id,     
+                'nombre'           => 'Mediana (12 rebanadas)',
+                'incremento_precio' => 45.00,
+                'orden'            => 2,
+            ],
+            [
+                'negocio_id'       => $pizzeria->id,      
+                'nombre'           => 'Grande (16 rebanadas)',
+                'incremento_precio' => 85.00,
+                'orden'            => 3,
+            ],
         ]);
 
         // negocio de comida china (se me antojo)
 
         $china = Negocio::create([
             'nombre'           => 'Dragon ball Z',
-            'subdominio'        => 'Dragon z',    
+            'subdominio'        => 'dragon-z',        
             'descripcion'      => 'comida china de la buena',
             'direccion'        => 'Calle Himno Nacional 456, San Luis Potosi',
             'telefono_whatsapp'         => '524441234567',
@@ -104,12 +123,14 @@ class NegociosSeeder extends Seeder
 
         // items
         $catEntradas->items()->create([
+            'negocio_id'  => $china->id,          
             'nombre'      => 'Rollitos de primavera (6 pzs)',
             'descripcion' => 'Relleno de verdura fresca, con salsa agridulce.',
             'precio'      => 65.00,
         ]);
 
         $catFuertes->items()->create([
+            'negocio_id'  => $china->id,          
             'nombre'      => 'Pollo agridulce',
             'descripcion' => 'Pollo empanizado con salsa agridulce, piña y pimiento.',
             'precio'      => 120.00,
@@ -117,15 +138,17 @@ class NegociosSeeder extends Seeder
 
         // Este apartado sirve para ver cuando un platillo este agotado
         $catFuertes->items()->create([
-            'nombre'         => 'Arroz frito con camaron',
-            'descripcion'    => 'Arroz salteado al wok con camaron, huevo y verduras.',
-            'precio'         => 135.00,
-            'disponible_hoy' => false,
+            'negocio_id'       => $china->id,     
+            'nombre'           => 'Arroz frito con camaron',
+            'descripcion'      => 'Arroz salteado al wok con camaron, huevo y verduras.',
+            'precio'           => 135.00,
+            'disponible_hoy'   => false,
         ]);
 
         $catBebidas2->items()->create([
+            'negocio_id'  => $china->id,          
             'nombre'      => 'Te de jazmin (jarra)',
-            'descripcion' => 'Te verde aromatizado con flor de jazmin.',
+            'descripcion' => 'Té verde aromatizado con flor de jazmin.',
             'precio'      => 40.00,
         ]);
     }

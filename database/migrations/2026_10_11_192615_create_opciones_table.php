@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('opciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('grupo_opcion_id')->constrained('grupos_opciones')->cascadeOnDelete();
+            $table->foreignId('negocio_id')->constrained('negocios')->cascadeOnDelete();
+            $table->string('imagen', 255)->nullable();
             $table->string('nombre', 100);
             $table->decimal('incremento_precio', 10, 2)->default(0);
             $table->integer('orden')->default(0);

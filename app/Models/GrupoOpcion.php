@@ -10,7 +10,7 @@ class GrupoOpcion extends Model
 
     protected $fillable = [
         'platillo_id', 'nombre', 'es_multiple', 'es_obligatorio',
-        'min_selecciones', 'max_selecciones', 'orden',
+        'min_selecciones', 'max_selecciones', 'orden', 'negocio_id'
     ];
 
     public function platillo()
