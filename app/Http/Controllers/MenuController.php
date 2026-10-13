@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Restaurante;
+use App\Models\Negocio;
 
 class MenuController extends Controller
 {
 
     public function inicio()
     {
-        $restaurantes = Restaurante::all();
+        $negocios = Negocio::all();
 
-        return view('restaurantes.index', compact('restaurantes'));
+        return view('negocios.index', compact('negocios'));
     }
 
 
     public function menu(int $id)
     {
-        $restaurante = Restaurante::with('categorias.platillos')->findOrFail($id);
+        $negocio = Negocio::with('categorias.item')->findOrFail($id);
 
-        return view('restaurantes.menu', compact('restaurante'));
+        return view('negocios.menu', compact('negocio'));
     }
 }

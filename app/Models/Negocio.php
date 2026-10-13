@@ -41,4 +41,14 @@ class Negocio extends Model
     {
         return $this->hasMany(Usuario::class);
     }
+
+    public function categorias()
+    {
+        return $this->hasMany(Categoria::class, 'negocio_id')->orderBy('orden');
+    }
+
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class, 'negocio_id');
+    }
 }

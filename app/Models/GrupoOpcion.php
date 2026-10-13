@@ -15,7 +15,7 @@ class GrupoOpcion extends Model
 
     public function platillo()
     {
-        return $this->belongsTo(Platillo::class);
+        return $this->belongsTo(Negocio::class);
     }
 
     public function opciones()

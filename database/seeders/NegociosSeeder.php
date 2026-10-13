@@ -2,25 +2,27 @@
 
 namespace Database\Seeders;
 
-use App\Models\Restaurante;
-use App\Models\Platillo;
+use App\Models\Negocio;
 use Illuminate\Database\Seeder;
 
-class RestaurantesSeeder extends Seeder
+class NegociosSeeder extends Seeder
 {
     public function run(): void
     {
 
         // negocio de pizza 
         
-        $pizzeria = Restaurante::create([
+        $pizzeria = Negocio::create([
             'nombre'           => 'Pizza Nova',
+            'subdominio'        => 'pizza-nova',
             'descripcion'      => 'Pizzas de las normales',
-            'color_principal'  => '#D32F2F',
             'direccion'        => 'Av. Universidad 1234, San Luis Potosi',
-            'telefono'         => '444-123-4567',
+            'telefono_whatsapp'         => '524441234567',
             'zona_horaria'     => 'America/Mexico_City',
+            'categoria'         => 'Pizzería',    
             'cerrado_temporal' => false,
+            'estado'            => 'activo',
+            'correo_contacto'   => 'contacto@pizzanova.mx',
         ]);
 
         // Este apartado pertenece al horario
@@ -36,20 +38,20 @@ class RestaurantesSeeder extends Seeder
         $catPizzas  = $pizzeria->categorias()->create(['nombre' => 'Pizzas',  'orden' => 1]);
         $catBebidas = $pizzeria->categorias()->create(['nombre' => 'Bebidas', 'orden' => 2]);
 
-        // Platillos
-        $margarita = $catPizzas->platillos()->create([
+        // items
+        $margarita = $catPizzas->items()->create([
             'nombre'      => 'Pizza Margarita',
             'descripcion' => 'Salsa de tomate San Marzano, mozzarella fresca y albahaca.',
             'precio'      => 149.00,
         ]);
 
-        $catPizzas->platillos()->create([
+        $catPizzas->items()->create([
             'nombre'      => 'Pizza Pepperoni',
             'descripcion' => 'Doble pepperoni y queso mozzarella extra.',
             'precio'      => 179.00,
         ]);
 
-        $catBebidas->platillos()->create([
+        $catBebidas->items()->create([
             'nombre'      => 'Refresco 600 ml',
             'descripcion' => 'Coca-Cola, Sprite o Fanta.',
             'precio'      => 35.00,
@@ -73,12 +75,15 @@ class RestaurantesSeeder extends Seeder
 
         // negocio de comida china (se me antojo)
 
-        $china = Restaurante::create([
+        $china = Negocio::create([
             'nombre'           => 'Dragon ball Z',
+            'subdominio'        => 'Dragon z',    
             'descripcion'      => 'comida china de la buena',
-            'color_principal'  => '#FFA000',
             'direccion'        => 'Calle Himno Nacional 456, San Luis Potosi',
-            'telefono'         => '444-765-4321',
+            'telefono_whatsapp'         => '524441234567',
+            'correo_contacto'   => 'contacto@china.mx',
+            'categoria'         => 'comida China',  
+            'estado'            => 'activo',
             'zona_horaria'     => 'America/Mexico_City',
             'cerrado_temporal' => false,
         ]);
@@ -94,31 +99,31 @@ class RestaurantesSeeder extends Seeder
 
         // Categorias
         $catEntradas = $china->categorias()->create(['nombre' => 'Entradas',          'orden' => 1]);
-        $catFuertes  = $china->categorias()->create(['nombre' => 'Platillos fuertes', 'orden' => 2]);
+        $catFuertes  = $china->categorias()->create(['nombre' => 'items fuertes', 'orden' => 2]);
         $catBebidas2 = $china->categorias()->create(['nombre' => 'Bebidas',           'orden' => 3]);
 
-        // Platillos
-        $catEntradas->platillos()->create([
+        // items
+        $catEntradas->items()->create([
             'nombre'      => 'Rollitos de primavera (6 pzs)',
             'descripcion' => 'Relleno de verdura fresca, con salsa agridulce.',
             'precio'      => 65.00,
         ]);
 
-        $catFuertes->platillos()->create([
+        $catFuertes->items()->create([
             'nombre'      => 'Pollo agridulce',
             'descripcion' => 'Pollo empanizado con salsa agridulce, piña y pimiento.',
             'precio'      => 120.00,
         ]);
 
         // Este apartado sirve para ver cuando un platillo este agotado
-        $catFuertes->platillos()->create([
+        $catFuertes->items()->create([
             'nombre'         => 'Arroz frito con camaron',
             'descripcion'    => 'Arroz salteado al wok con camaron, huevo y verduras.',
             'precio'         => 135.00,
             'disponible_hoy' => false,
         ]);
 
-        $catBebidas2->platillos()->create([
+        $catBebidas2->items()->create([
             'nombre'      => 'Te de jazmin (jarra)',
             'descripcion' => 'Te verde aromatizado con flor de jazmin.',
             'precio'      => 40.00,

@@ -10,11 +10,11 @@ class Categoria extends Model
 
     public function restaurante()
     {
-        return $this->belongsTo(Restaurante::class, 'negocio_id');
+        return $this->belongsTo(Negocio::class, 'negocio_id');
     }
 
     public function items()
     {
-        return $this->hasMany(Platillo::class)->orderBy('nombre');
+        return $this->hasMany(Item::class)->orderBy('nombre');
     }
 }
