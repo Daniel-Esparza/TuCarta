@@ -9,6 +9,8 @@ return new class extends Migration
 {
     public function up(): void
     {
+        DB::statement('DROP TYPE IF EXISTS estado_pedido');
+        DB::statement('DROP TYPE IF EXISTS tipo_entrega');
         DB::statement("CREATE TYPE tipo_entrega AS ENUM ('en_sitio', 'para_llevar', 'domicilio')");
         DB::statement("CREATE TYPE estado_pedido AS ENUM ('recibido', 'confirmado', 'en_preparacion', 'listo', 'en_camino', 'entregado', 'cancelado')");
 
