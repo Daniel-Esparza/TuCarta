@@ -2,11 +2,11 @@
 <!-- Describe brevemente los cambios introducidos en este Pull Request -->
 
 ## Tipo de cambio
-- [ ] 🐛 Corrección de errores (bug fix)
-- [ ] ✨ Nueva característica (feature)
-- [ ] 🎨 Cambio de diseño / estilos (UI/UX)
-- [ ] 🧹 Refactorización / Mantenimiento
-- [ ] 📝 Documentación
+- [ ] Corrección de errores (bug fix)
+- [ ] Nueva característica (feature)
+- [ ] Cambio de diseño / estilos (UI/UX)
+- [ ] Refactorización / Mantenimiento
+- [ ] Documentación
 
 ## ¿Cómo probar los cambios?
 <!-- Indica los pasos para verificar que los cambios funcionan correctamente -->
