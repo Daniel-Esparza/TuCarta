@@ -9,13 +9,13 @@ class GrupoOpcion extends Model
     protected $table = 'grupos_opciones';
 
     protected $fillable = [
-        'platillo_id', 'nombre', 'es_multiple', 'es_obligatorio',
+        'item_id', 'nombre', 'es_multiple', 'es_obligatorio',
         'min_selecciones', 'max_selecciones', 'orden', 'negocio_id'
     ];
 
-    public function platillo()
+    public function item()
     {
-        return $this->belongsTo(Negocio::class);
+        return $this->belongsTo(item::class);
     }
 
     public function opciones()

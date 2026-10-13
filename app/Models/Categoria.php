@@ -8,7 +8,7 @@ class Categoria extends Model
 {
     protected $fillable = ['negocio_id', 'nombre', 'orden', 'activo'];
 
-    public function restaurante()
+    public function negocio()
     {
         return $this->belongsTo(Negocio::class, 'negocio_id');
     }
