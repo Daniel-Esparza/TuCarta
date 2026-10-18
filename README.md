@@ -21,6 +21,36 @@ Proyecto de la materia Arquitectura Avanzada de Aplicaciones Web (UTSLP).
 
 No hace falta instalar PHP, Composer ni PostgreSQL en tu computadora.
 
+## Revisión rápida solo con Docker
+
+Para revisar el proyecto basta con Git y Docker Desktop. Funciona igual desde PowerShell, CMD, macOS o Linux, sin WSL:
+
+```bash
+git clone https://github.com/Daniel-Esparza/TuCarta.git
+cd TuCarta
+docker compose up -d
+```
+
+La primera vez tarda bastante, alrededor de 30 minutos según la computadora y la conexión: construye la imagen, instala las dependencias de PHP, crea el `.env`, genera la llave de la aplicación y carga la base de datos con los datos de prueba. Las siguientes veces arranca en segundos. Para ver cuándo termina:
+
+```bash
+docker compose logs -f laravel.test
+```
+
+Cuando aparezca `Server running on [http://0.0.0.0:80]`, abre http://localhost. Sal de los logs con `Ctrl+C`.
+
+Si el puerto 80 está ocupado, usa otro puerto:
+
+| Terminal | Comando |
+|---|---|
+| PowerShell | `$env:APP_PORT=8080; docker compose up -d` |
+| CMD | `set APP_PORT=8080` y luego `docker compose up -d` |
+| macOS / Linux | `APP_PORT=8080 docker compose up -d` |
+
+y abre http://localhost:8080.
+
+Para apagarlo: `docker compose down`. Para borrar también la base de datos: `docker compose down -v`.
+
 ## Instalación
 
 1. Clona el repositorio y entra a la carpeta:
