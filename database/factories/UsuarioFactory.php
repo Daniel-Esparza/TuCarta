@@ -16,8 +16,6 @@ class UsuarioFactory extends Factory
     protected static ?string $password;
 
     /**
-     * Por defecto crea un cliente activo.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array

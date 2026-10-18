@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
-# Genera (o vuelve a generar) el certificado de TuCarta para el dominio
-# configurado en TUCARTA_DOMINIO y todos sus subdominios.
-#
-# Uso, desde la raíz del proyecto:
-#   ./docker/certs/generar-certificado.sh
-#
-# Requiere mkcert. En Windows con WSL se usa mkcert.exe de Windows, para que
-# el certificado quede como confiable en los navegadores de Windows.
+# Certificado para TUCARTA_DOMINIO y sus subdominios (requiere mkcert)
+# Uso: ./docker/certs/generar-certificado.sh
 
 set -euo pipefail
 

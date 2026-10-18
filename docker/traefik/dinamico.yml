@@ -1,7 +1,4 @@
-# Configuración dinámica de Traefik.
-# Cualquier dominio o subdominio que llegue se manda a Laravel, así que un
-# negocio nuevo funciona sin tocar nada aquí. El certificado lo genera
-# docker/certs/generar-certificado.sh.
+# Todo subdominio va a Laravel. Certificado: docker/certs/generar-certificado.sh
 
 http:
   routers:

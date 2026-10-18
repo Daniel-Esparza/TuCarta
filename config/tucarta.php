@@ -2,12 +2,7 @@
 
 return [
 
-    /*
-    | Dominio base de la plataforma. Cada negocio se abre en
-    | {subdominio}.{dominio}. Es lo único que cambia entre un escritorio
-    | local (tucarta.localhost) y el servidor del equipo (tucarta.local).
-    */
-
+    // Cada negocio se abre en {subdominio}.{dominio}
     'dominio' => env('TUCARTA_DOMINIO', 'tucarta.localhost'),
 
 ];

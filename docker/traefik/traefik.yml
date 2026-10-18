@@ -1,5 +1,4 @@
-# Configuración estática de Traefik.
-# Recibe el tráfico en 80 y 443; todo lo que llega por HTTP se redirige a HTTPS.
+# HTTP (80) redirige a HTTPS (443)
 
 entryPoints:
   web:

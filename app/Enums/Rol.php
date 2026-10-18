@@ -2,10 +2,7 @@
 
 namespace App\Enums;
 
-/**
- * Tipos base de usuario (usuarios.rol). Moderador y empleado no son tipos
- * aparte: son administrador o negocio con menos permisos en usuario_permisos.
- */
+// Moderador y empleado no son roles aparte, se distinguen por sus permisos.
 enum Rol: string
 {
     case Administrador = 'administrador';
