@@ -2,8 +2,36 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
 
+/*
+ * Sistema de diseño "Beige Terroso & Gourmet" (guía de estilos v2.4, Mobile-First)
+ * Cada token genera su clase de Tailwind, por ejemplo:
+ *   --color-brand-terracotta  ->  bg-brand-terracotta, text-brand-terracotta, border-brand-terracotta
+ * Para cambiar un color en todo el sistema, se cambia aquí y en ningún otro lugar.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+       --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-brand-terracotta: #D85A38;
+    --color-brand-terracottaHover: #BF4B2B;
+    --color-brand-teal: #1D5A68;
+    --color-brand-tealHover: #14434E;
+    --color-brand-dark: #2A2421;
+    --color-brand-darkHover: #1A1614;
+    --color-brand-beigeBg: #F3EFEA;
+    --color-brand-beigeCard: #FAF8F5;
+    --color-brand-beigeBorder: #E5DDD3;
+    --color-brand-beigeInput: #F0EAE1;
+}
+
+/* Oculta la barra de scroll en carruseles y pestañas horizontales */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
