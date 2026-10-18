@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Database\Seeders\NucleoSeeder;
 use App\Enums\Rol;
 use App\Models\Negocio;
 use App\Models\Permiso;
@@ -72,7 +73,7 @@ class MigracionesNucleoTest extends TestCase
 
     public function test_el_seeder_crea_administrador_moderador_y_dos_negocios_con_dueno(): void
     {
-        $this->seed();
+        $this->seed(NucleoSeeder::class);
 
         $administradores = Usuario::where('rol', Rol::Administrador)->get();
         $this->assertCount(2, $administradores);
