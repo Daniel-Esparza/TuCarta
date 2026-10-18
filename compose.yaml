@@ -1,40 +1,44 @@
 services:
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.5'
+            context: './docker/app'
             dockerfile: Dockerfile
             args:
-                WWWGROUP: '${WWWGROUP}'
+                WWWGROUP: '${WWWGROUP:-1000}'
         image: 'sail-8.5/app'
+        entrypoint: ['bash', '/var/www/html/docker/app/preparar.sh']
+        restart: on-failure:5
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
             - '${APP_PORT:-80}:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
-            WWWUSER: '${WWWUSER}'
+            WWWUSER: '${WWWUSER:-1000}'
+            WWWGROUP: '${WWWGROUP:-1000}'
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
-            IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            IGNITION_LOCAL_SITES_PATH: '${PWD:-}'
         volumes:
             - '.:/var/www/html'
         networks:
             - sail
         depends_on:
-            - pgsql
+            pgsql:
+                condition: service_healthy
     pgsql:
         image: 'postgres:16-alpine'
         ports:
             - '${FORWARD_DB_PORT:-5432}:5432'
         environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: '${DB_DATABASE}'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+            PGPASSWORD: '${DB_PASSWORD:-password}'
+            POSTGRES_DB: '${DB_DATABASE:-tucarta}'
+            POSTGRES_USER: '${DB_USERNAME:-sail}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-password}'
         volumes:
             - 'sail-pgsql:/var/lib/postgresql/data'
-            - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
+            - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
         healthcheck:
@@ -43,10 +47,11 @@ services:
                 - pg_isready
                 - '-q'
                 - '-d'
-                - '${DB_DATABASE}'
+                - '${DB_DATABASE:-tucarta}'
                 - '-U'
-                - '${DB_USERNAME}'
-            retries: 3
+                - '${DB_USERNAME:-sail}'
+            interval: 5s
+            retries: 10
             timeout: 5s
     traefik:
         image: 'traefik:v3.1'
