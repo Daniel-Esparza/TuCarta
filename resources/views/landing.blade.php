@@ -1,27 +1,7 @@
-{{--
-    US-31: Landing page de TuCarta
-    Archivo: resources/views/landing.blade.php
-
-    VERSION PROVISIONAL (HTML sencillo, sin layout compartido).
-    Cuando los estilos de Cami esten en dev:
-      1. Quitar el bloque <style> y la estructura <!DOCTYPE html>...<body>.
-      2. Envolver el contenido de <body> con <x-layouts.app> ... </x-layouts.app>.
-      3. Sustituir las clases provisionales por las clases y tokens del equipo.
---}}
 @php
-    // PENDIENTE: confirmar los nombres reales con `./vendor/bin/sail artisan route:list`
-    // y escribirlos aqui. Mientras sean null, la pagina no enlaza a rutas inexistentes.
-    $rutaRestaurantes = null;     // ejemplo: 'restaurantes.index'
-    $rutaRegistroNegocio = null;  // ejemplo: 'negocios.create'
-
-    $urlRestaurantes = ($rutaRestaurantes && Route::has($rutaRestaurantes))
-        ? route($rutaRestaurantes)
-        : null;
-
-    // Solucion provisional: sin ruta de registro, el boton lleva a la seccion para restaurantes.
-    $urlRegistro = ($rutaRegistroNegocio && Route::has($rutaRegistroNegocio))
-        ? route($rutaRegistroNegocio)
-        : '#para-restaurantes';
+    // Mientras no existan las rutas de restaurantes y de registro
+    $urlRestaurantes = null;
+    $urlRegistro = '#para-restaurantes';
 @endphp
 <!DOCTYPE html>
 <html lang="es">
@@ -31,7 +11,6 @@
     <title>TuCarta | Consulta la carta y pide por WhatsApp</title>
     <meta name="description" content="TuCarta es una plataforma para encontrar restaurantes, revisar sus cartas y hacer tu pedido por WhatsApp.">
 
-    {{-- Estilo provisional: solo estructura y adaptacion a pantallas. Eliminar al integrar el layout del equipo. --}}
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }

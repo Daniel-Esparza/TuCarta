@@ -1,0 +1,26 @@
+# Todo subdominio va a Laravel. Certificado: docker/certs/generar-certificado.sh
+
+http:
+  routers:
+    tucarta:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - websecure
+      service: laravel
+      tls: {}
+
+  services:
+    laravel:
+      loadBalancer:
+        servers:
+          - url: "http://laravel.test:80"
+
+tls:
+  certificates:
+    - certFile: /certs/tucarta.pem
+      keyFile: /certs/tucarta-key.pem
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/tucarta.pem
+        keyFile: /certs/tucarta-key.pem
