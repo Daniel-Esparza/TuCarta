@@ -1,0 +1,21 @@
+# Configuración estática de Traefik.
+# Recibe el tráfico en 80 y 443; todo lo que llega por HTTP se redirige a HTTPS.
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+
+providers:
+  file:
+    filename: /etc/traefik/dinamico.yml
+
+log:
+  level: INFO
