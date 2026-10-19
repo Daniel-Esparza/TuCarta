@@ -12,8 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Las peticiones llegan por Traefik (ver docs/servidor.md)
+        // Las peticiones llegan por Traefik 
         $middleware->trustProxies(at: '*');
+
+        // US-23: proteger rutas por permiso 
+        $middleware->alias([
+            'permiso' => \App\Http\Middleware\EnsurePermiso::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
