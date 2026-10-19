@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
 
             NucleoSeeder::class,
             NegociosSeeder::class,
+            EmpleadosSeeder::class,
 
         ]);
 
