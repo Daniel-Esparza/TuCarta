@@ -1,22 +1,8 @@
-{{--
-    Campo de formulario de TuCarta.
-    Uso:
-        <x-input name="nombre" label="Nombre" placeholder="Tu nombre" />
-        <x-input name="telefono" label="WhatsApp" type="tel" />
---}}
-@props(['name', 'label' => null])
+@props(['disabled' => false])
 
-<label for="{{ $name }}" class="block">
-    @if ($label)
-        <span class="mb-1.5 block text-xs font-semibold text-brand-dark">{{ $label }}</span>
-    @endif
-
-    <input
-        id="{{ $name }}"
-        name="{{ $name }}"
-        {{ $attributes->merge([
-            'type' => 'text',
-            'class' => 'w-full rounded-xl border border-brand-beigeBorder bg-brand-beigeInput px-4 py-3 text-sm text-brand-dark placeholder:text-brand-dark/40 focus:border-brand-teal focus:outline-none focus:ring-2 focus:ring-brand-teal/20',
-        ]) }}
-    >
-</label>
+<input 
+    {{ $disabled ? 'disabled' : '' }} 
+    {{ $attributes->merge([
+        'class' => 'w-full min-h-[44px] px-3.5 py-2.5 bg-brand-beigeInput text-brand-dark border border-brand-beigeBorder rounded-lg focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta outline-none transition-colors duration-200'
+    ]) }}
+>

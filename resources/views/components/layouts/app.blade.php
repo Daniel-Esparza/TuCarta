@@ -1,23 +1,21 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full bg-brand-beigeBg">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'TuCarta' }}</title>
-
-    {{-- Fuente oficial: Plus Jakarta Sans --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-brand-beigeBg font-sans text-brand-dark antialiased">
-    <div class="min-h-screen px-4 py-6 sm:py-10">
-        {{-- Marco móvil obligatorio: clases exactas de la guía de estilos --}}
-        <main class="max-w-md bg-brand-beigeCard rounded-[32px] shadow-2xl shadow-brand-dark/10 border border-brand-beigeBorder overflow-hidden p-5 sm:p-6 relative min-h-[660px] flex flex-col justify-between mx-auto">
-            {{ $slot }}
-        </main>
-    </div>
+<body class="h-full text-brand-dark font-sans antialiased flex flex-col">
+    <header class="bg-brand-beigeCard border-b border-brand-beigeBorder px-4 py-3 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-brand-terracotta">TuCarta</h1>
+            {{ $header ?? '' }}
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
+        {{ $slot }}
+    </main>
 </body>
 </html>
