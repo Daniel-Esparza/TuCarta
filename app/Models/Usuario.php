@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 #[Fillable([
     'negocio_id',
@@ -73,6 +74,26 @@ class Usuario extends Authenticatable
                 }
             })
             ->exists();
+    }
+
+    /** US-27: ¿tiene el permiso con alcance global (negocio_id nulo)? */
+    public function tienePermisoGlobal(string $clave): bool
+    {
+        return $this->permisos()
+            ->join('permisos', 'permisos.id', '=', 'usuario_permisos.permiso_id')
+            ->where('permisos.clave', $clave)
+            ->whereNull('usuario_permisos.negocio_id')
+            ->exists();
+    }
+
+    /** US-27: IDs de los negocios sobre los que tiene el permiso de forma específica. */
+    public function negociosConPermiso(string $clave): Collection
+    {
+        return $this->permisos()
+            ->join('permisos', 'permisos.id', '=', 'usuario_permisos.permiso_id')
+            ->where('permisos.clave', $clave)
+            ->whereNotNull('usuario_permisos.negocio_id')
+            ->pluck('usuario_permisos.negocio_id');
     }
 
     public function esAdministrador(): bool

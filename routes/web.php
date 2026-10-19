@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EquipoController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ModeradorController;
 
 Route::view('/', 'landing')->name('landing');
 
@@ -26,3 +27,10 @@ Route::get('/prueba/editar-precios', fn () => 'Permiso editar_precios: OK')
     ->middleware('permiso:editar_precios')->name('prueba.editar-precios');
 Route::get('/prueba/editar-perfil', fn () => 'Permiso editar_perfil: OK')
     ->middleware('permiso:editar_perfil')->name('prueba.editar-perfil');
+
+    Route::middleware('auth')->prefix('admin/moderadores')->name('moderadores.')->group(function () {
+    Route::get('/', [ModeradorController::class, 'index'])->name('index');
+    Route::post('/', [ModeradorController::class, 'store'])->name('store');
+    Route::post('{moderador}/permisos', [ModeradorController::class, 'asignarPermiso'])->name('permisos.store');
+    Route::delete('{moderador}/permisos/{asignacion}', [ModeradorController::class, 'quitarPermiso'])->name('permisos.destroy');
+});
