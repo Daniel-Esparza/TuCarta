@@ -21,6 +21,7 @@ use Illuminate\Notifications\Notifiable;
     'correo_contacto',
     'password',
     'estado',
+    'email_verified_at',
     'telefono_whatsapp',
 ])]
 #[Hidden(['password'])]
@@ -52,6 +53,26 @@ class Usuario extends Authenticatable
     public function permisos(): HasMany
     {
         return $this->hasMany(UsuarioPermiso::class);
+    }
+
+    /**
+     * ¿Este usuario tiene el permiso indicado?
+     * US-23 y US-27 comparten esta lógica.
+     */
+    public function tienePermiso(string $clave, ?int $negocioId = null): bool
+    {
+        $negocioId ??= $this->negocio_id;
+
+        return $this->permisos()
+            ->join('permisos', 'permisos.id', '=', 'usuario_permisos.permiso_id')
+            ->where('permisos.clave', $clave)
+            ->where(function ($q) use ($negocioId) {
+                $q->whereNull('usuario_permisos.negocio_id'); // permiso global
+                if ($negocioId !== null) {
+                    $q->orWhere('usuario_permisos.negocio_id', $negocioId);
+                }
+            })
+            ->exists();
     }
 
     public function esAdministrador(): bool

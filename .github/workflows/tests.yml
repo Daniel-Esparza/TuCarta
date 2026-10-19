@@ -27,7 +27,13 @@ jobs:
         with:
           php-version: '8.5'
           extensions: pdo_pgsql, pgsql
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run build
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
       - run: php artisan test
+
