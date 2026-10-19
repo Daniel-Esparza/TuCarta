@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'primary', // 'primary', 'terracotta', 'secondary', 'teal' o 'outline'
+    'variant' => 'primary',
     'type' => 'button',
 ])
 
