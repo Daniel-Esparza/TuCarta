@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ClavePermiso;
 use App\Models\Usuario;
 
 class UsuarioPolicy
@@ -10,7 +11,7 @@ class UsuarioPolicy
     private function puedeGestionarCuentas(Usuario $usuario): bool
     {
         return $usuario->esAdministrador()
-            && $usuario->tienePermisoGlobal('gestionar_moderadores');
+            && $usuario->tienePermisoGlobal(ClavePermiso::GestionarModeradores);
     }
 
     public function create(Usuario $usuario): bool
