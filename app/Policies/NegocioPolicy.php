@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ClavePermiso;
 use App\Models\Negocio;
 use App\Models\Usuario;
 
@@ -14,8 +15,8 @@ class NegocioPolicy
     public function viewAny(Usuario $usuario): bool
     {
         return $usuario->esAdministrador()
-            && ($usuario->tienePermisoGlobal('gestionar_negocios')
-                || $usuario->negociosConPermiso('gestionar_negocios')->isNotEmpty());
+            && ($usuario->tienePermisoGlobal(ClavePermiso::GestionarNegocios)
+                || $usuario->negociosConPermiso(ClavePermiso::GestionarNegocios)->isNotEmpty());
     }
 
     /**
@@ -24,7 +25,7 @@ class NegocioPolicy
     public function view(Usuario $usuario, Negocio $negocio): bool
     {
         return $usuario->esAdministrador()
-            && $usuario->tienePermiso('gestionar_negocios', $negocio->id);
+            && $usuario->tienePermiso(ClavePermiso::GestionarNegocios, $negocio);
     }
 
     // US-27 solo cubre la consulta. Crear, editar y borrar negocios no se abre.

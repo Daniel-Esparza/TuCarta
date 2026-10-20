@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClavePermiso;
 use App\Enums\Rol;
 use App\Models\Negocio;
-use App\Models\Permiso;
 use App\Models\Usuario;
+use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
@@ -14,19 +15,19 @@ class EquipoTrabajoTest extends TestCase
 {
     use RefreshDatabase;
 
-    
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(PermisosSeeder::class);
+    }
+
     private function duenoConPermisoDeEquipo(): array
     {
         $negocio = Negocio::factory()->create();
 
         $dueno = Usuario::factory()->deNegocio($negocio)->create();
-        $dueno->permisos()->create([
-            'permiso_id' => Permiso::firstOrCreate(
-                ['clave' => 'gestionar_equipo'],
-                ['descripcion' => 'Gestionar el equipo de trabajo', 'tipo_usuario' => 'negocio'],
-            )->id,
-            'negocio_id' => $negocio->id,
-        ]);
+        $dueno->otorgarPermiso(ClavePermiso::GestionarEquipo, $negocio);
 
         return [$negocio, $dueno];
     }
@@ -77,10 +78,6 @@ class EquipoTrabajoTest extends TestCase
     {
         [$negocio, $dueno] = $this->duenoConPermisoDeEquipo();
 
-        
-        Permiso::firstOrCreate(['clave' => 'avanzar_pedidos'], ['descripcion' => 'Avanzar pedidos', 'tipo_usuario' => 'negocio']);
-        Permiso::firstOrCreate(['clave' => 'marcar_agotado'], ['descripcion' => 'Marcar agotados', 'tipo_usuario' => 'negocio']);
-
         $this->actingAs($dueno)
             ->post('/equipo', $this->datosDeEmpleado())
             ->assertRedirect(route('equipo.index'));
@@ -91,12 +88,10 @@ class EquipoTrabajoTest extends TestCase
         $this->assertEquals($negocio->id, $empleado->negocio_id);
         $this->assertEquals('activo', $empleado->estado);
 
-        
-        $this->assertTrue($empleado->tienePermiso('avanzar_pedidos'));
-        $this->assertTrue($empleado->tienePermiso('marcar_agotado'));
-        $this->assertFalse($empleado->tienePermiso('ver_metricas'));
+        $this->assertTrue($empleado->tienePermiso(ClavePermiso::AvanzarPedidos));
+        $this->assertTrue($empleado->tienePermiso(ClavePermiso::MarcarAgotado));
+        $this->assertFalse($empleado->tienePermiso(ClavePermiso::VerMetricas));
 
-        
         $this->assertTrue(Auth::attempt([
             'email' => 'maria@example.com',
             'password' => '12345678',

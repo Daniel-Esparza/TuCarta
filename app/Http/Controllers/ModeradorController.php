@@ -10,7 +10,9 @@ use App\Models\UsuarioPermiso;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use InvalidArgumentException;
 
 class ModeradorController extends Controller
 {
@@ -24,7 +26,7 @@ class ModeradorController extends Controller
                 ->with(['permisos.permiso', 'permisos.negocio'])
                 ->orderBy('nombre')
                 ->get(),
-            'permisos' => Permiso::where('tipo_usuario', 'administrador')->orderBy('clave')->get(),
+            'permisos' => Permiso::where('tipo_usuario', Rol::Administrador->value)->orderBy('clave')->get(),
             'negocios' => Negocio::orderBy('nombre')->get(),
         ]);
     }
@@ -56,14 +58,17 @@ class ModeradorController extends Controller
             'negocio_id' => ['nullable', 'exists:negocios,id'], // vacío = global
         ]);
 
-        UsuarioPermiso::firstOrCreate(
-            [
-                'usuario_id' => $moderador->id,
-                'permiso_id' => $datos['permiso_id'],
-                'negocio_id' => $datos['negocio_id'] ?? null,
-            ],
-            ['asignado_por' => $request->user()->id]
-        );
+        $permiso = Permiso::findOrFail($datos['permiso_id']);
+        $negocio = isset($datos['negocio_id']) ? Negocio::findOrFail($datos['negocio_id']) : null;
+
+        // otorgarPermiso rechaza permisos que no son del catálogo de administrador.
+        try {
+            $moderador->otorgarPermiso($permiso->claveEnum(), $negocio, $request->user());
+        } catch (InvalidArgumentException) {
+            throw ValidationException::withMessages([
+                'permiso_id' => 'Ese permiso no pertenece al catálogo de administrador.',
+            ]);
+        }
 
         return back()->with('estado', 'Permiso asignado.');
     }

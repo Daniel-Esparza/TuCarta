@@ -10,6 +10,8 @@ class NucleoSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(PermisosSeeder::class);
+
         // Contraseña de todas las cuentas: password
         Usuario::factory()->administrador()->create([
             'nombre' => 'Admin',
@@ -34,14 +36,15 @@ class NucleoSeeder extends Seeder
             'subdominio' => 'sushi-ana',
         ]);
 
+        // Cada dueño recibe todos los permisos de su negocio
         Usuario::factory()->deNegocio($tacos)->create([
             'nombre' => 'Juan',
             'email' => 'juan@tacos-juan.tucarta.local',
-        ]);
+        ])->otorgarPermisosDeDueno();
 
         Usuario::factory()->deNegocio($sushi)->create([
             'nombre' => 'Ana',
             'email' => 'ana@sushi-ana.tucarta.local',
-        ]);
+        ])->otorgarPermisosDeDueno();
     }
 }
