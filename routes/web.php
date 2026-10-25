@@ -40,4 +40,6 @@ Route::get('/prueba/editar-perfil', fn () => 'Permiso editar_perfil: OK')
 
 Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(function () {
     Route::get('/', [NegocioController::class, 'index'])->name('index');
+    Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
+    Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
 });
