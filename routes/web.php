@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\EquipoController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ModeradorController;
+use App\Http\Controllers\NegocioPublicoController;
+use Illuminate\Support\Facades\Route;
+
+// US-02b: la direccion de cada negocio ({subdominio}.{dominio}) segun su estado.
+// Va antes de la landing, que responde en cualquier host.
+Route::domain('{subdominio}.'.config('tucarta.dominio'))
+    ->get('/', [NegocioPublicoController::class, 'mostrar'])
+    ->name('negocio.publico');
 
 Route::view('/', 'landing')->name('landing');
-
-/*
-US-23: Equipo de trabajo del dueño (alta y desactivación de empleados)
-*/
 
 Route::middleware('permiso:gestionar_equipo')->group(function () {
     Route::get('/equipo', [EquipoController::class, 'index'])->name('equipo.index');
