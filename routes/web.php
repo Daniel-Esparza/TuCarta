@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\EquipoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ModeradorController;
@@ -33,4 +34,10 @@ Route::get('/prueba/editar-perfil', fn () => 'Permiso editar_perfil: OK')
     Route::post('/', [ModeradorController::class, 'store'])->name('store');
     Route::post('{moderador}/permisos', [ModeradorController::class, 'asignarPermiso'])->name('permisos.store');
     Route::delete('{moderador}/permisos/{asignacion}', [ModeradorController::class, 'quitarPermiso'])->name('permisos.destroy');
+});
+
+
+
+Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(function () {
+    Route::get('/', [NegocioController::class, 'index'])->name('index');
 });
