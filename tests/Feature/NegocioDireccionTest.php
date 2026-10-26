@@ -66,9 +66,12 @@ class NegocioDireccionTest extends TestCase
         $this->get($this->url('sushi-ana'))->assertSee('Sushi Ana')->assertDontSee('Tacos Juan');
     }
 
-    public function test_el_panel_central_no_cae_en_la_pagina_de_error(): void
+        public function test_el_panel_central_no_cae_en_la_pagina_de_error(): void
     {
-        $this->get($this->url('auth'))->assertRedirect(route('panel'));
+        $respuesta = $this->get($this->url('auth'));
+
+        $respuesta->assertStatus(302);
+        $this->assertStringEndsWith('/panel', $respuesta->headers->get('Location'));
     }
 
     public function test_un_negocio_recien_creado_abre_en_su_direccion_sin_configuracion(): void

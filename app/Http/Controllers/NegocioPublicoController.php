@@ -18,7 +18,7 @@ class NegocioPublicoController extends Controller
     public function mostrar(string $subdominio): Response
     {
         if ($subdominio === self::SUBDOMINIO_CENTRAL) {
-            return redirect()->route('panel');
+            return redirect('/panel');
         }
 
         $negocio = Negocio::where('subdominio', $subdominio)->first();
