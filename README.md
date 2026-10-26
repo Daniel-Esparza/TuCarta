@@ -31,7 +31,7 @@ cd TuCarta
 docker compose up -d
 ```
 
-La primera vez tarda bastante, alrededor de 30 minutos según la computadora y la conexión: construye la imagen, instala las dependencias de PHP, crea el `.env`, genera la llave de la aplicación y carga la base de datos con los datos de prueba. Las siguientes veces arranca en segundos. Para ver cuándo termina:
+La primera vez tarda bastante, alrededor de 45 minutos según la computadora y la conexión: construye la imagen, instala las dependencias de PHP y de JavaScript, compila los estilos, crea el `.env`, genera la llave de la aplicación y carga la base de datos con los datos de prueba. Las siguientes veces arranca en segundos. Para ver cuándo termina:
 
 ```bash
 docker compose logs -f laravel.test
