@@ -17,7 +17,14 @@ El dominio base sale de `TUCARTA_DOMINIO` (`tucarta.localhost` en los escritorio
 | `auth.{dominio}` | Login unificado (`/`) y panel del administrador y moderadores (`/panel`). No es un negocio |
 | `{subdominio}.{dominio}` | Todo lo de un negocio: su página pública (`/`), el seguimiento por folio (`/pedido/{folio}`) y el panel del dueño y sus empleados (`/panel`) |
 
-Subdominios reservados, que nunca son negocio: `auth`, `www`, `admin`, `api`, `app`, `mail` (`config/tucarta.php`).
+Subdominios reservados, que nunca son negocio: `auth`, `www`, `admin`, `api`, `app`, `mail`, `traefik` (`config/tucarta.php`).
+
+## Estado del negocio y dirección web (Sprint 6)
+
+- Los estados viven en `App\Enums\EstadoNegocio`: `Activo`, `Suspendido`, `Pendiente` y `Rechazado`. El modelo `Negocio` lo regresa como enum: `$negocio->estado === EstadoNegocio::Activo`. El motivo de un rechazo va en `motivo_rechazo`.
+- La dirección web se valida siempre con `new App\Rules\DireccionWeb` (formato, 3 a 30 caracteres, reservadas y repetida). Para editar un negocio: `new DireccionWeb($negocio)`, así su propia dirección no cuenta como repetida.
+- El WhatsApp se valida con `new App\Rules\Whatsapp`, después de `Whatsapp::normalizar()`.
+- Nadie crea migraciones de `negocios` por su cuenta: los cambios de base de datos se piden a quien lleva el Bloque 1.
 
 ## Middleware
 
