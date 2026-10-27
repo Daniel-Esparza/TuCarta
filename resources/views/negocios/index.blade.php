@@ -15,8 +15,8 @@
 
             <x-select nombre="estado" etiqueta="Estado">
                 <option value="">Todos los estados</option>
-                @foreach (['activo', 'pendiente', 'suspendido', 'rechazado'] as $estado)
-                    <option value="{{ $estado }}" @selected(request('estado') === $estado)>{{ ucfirst($estado) }}</option>
+                @foreach (App\Enums\EstadoNegocio::cases() as $estado)
+                    <option value="{{ $estado->value }}" @selected(request('estado') === $estado->value)>{{ $estado->etiqueta() }}</option>
                 @endforeach
             </x-select>
 
@@ -37,7 +37,7 @@
                         <x-tabla.celda etiqueta="Productos">{{ $negocio->items_count }}</x-tabla.celda>
                         <x-tabla.celda etiqueta="Fecha de alta">{{ $negocio->created_at->format('d/m/Y') }}</x-tabla.celda>
                         <x-tabla.celda etiqueta="Acciones">
-                            @if ($negocio->estado === 'suspendido')
+                            @if ($negocio->estado === App\Enums\EstadoNegocio::Suspendido)
                                 <x-confirmar :accion="route('negocios.reactivar', $negocio)" metodo="PATCH"
                                              etiqueta="Reactivar" titulo="Reactivar este negocio"
                                              mensaje="Su menu volvera a estar disponible para clientes."

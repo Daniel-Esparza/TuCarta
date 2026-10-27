@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ClavePermiso;
+use App\Enums\EstadoNegocio;
 use App\Enums\Rol;
 use App\Models\Negocio;
 use App\Models\Usuario;
@@ -153,7 +154,7 @@ class ListaNegociosTest extends TestCase
             ->patch(route('negocios.suspender', $negocio))
             ->assertRedirect(route('negocios.index'));
 
-        $this->assertSame('suspendido', $negocio->fresh()->estado);
+        $this->assertSame(EstadoNegocio::Suspendido, $negocio->fresh()->estado);
         $this->assertSame(3, $negocio->fresh()->items()->count());
     }
 
@@ -168,7 +169,7 @@ class ListaNegociosTest extends TestCase
             ->patch(route('negocios.reactivar', $negocio))
             ->assertRedirect(route('negocios.index'));
 
-        $this->assertSame('activo', $negocio->fresh()->estado);
+        $this->assertSame(EstadoNegocio::Activo, $negocio->fresh()->estado);
     }
 
     public function test_una_peticion_get_a_suspender_no_cambia_nada(): void
@@ -182,7 +183,7 @@ class ListaNegociosTest extends TestCase
             ->get(route('negocios.suspender', $negocio))
             ->assertStatus(405);
 
-        $this->assertSame('activo', $negocio->fresh()->estado);
+        $this->assertSame(EstadoNegocio::Activo, $negocio->fresh()->estado);
     }
 
     public function test_el_moderador_con_permiso_sobre_un_negocio_solo_ve_ese(): void
@@ -236,6 +237,6 @@ class ListaNegociosTest extends TestCase
             ->patch(route('negocios.suspender', $negocio))
             ->assertForbidden();
 
-        $this->assertSame('activo', $negocio->fresh()->estado);
+        $this->assertSame(EstadoNegocio::Activo, $negocio->fresh()->estado);
     }
 }

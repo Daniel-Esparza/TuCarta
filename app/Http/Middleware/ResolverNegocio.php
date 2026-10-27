@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\EstadoNegocio;
 use App\Models\Negocio;
 use App\Support\NegocioActual;
 use Closure;
@@ -29,11 +30,11 @@ class ResolverNegocio
 
         $negocio = Negocio::where('subdominio', $subdominio)->first();
 
-        if ($negocio?->estado === 'suspendido') {
+        if ($negocio?->estado === EstadoNegocio::Suspendido) {
             return response()->view('negocio.suspendido', ['negocio' => $negocio]);
         }
 
-        if ($negocio?->estado !== 'activo') {
+        if ($negocio?->estado !== EstadoNegocio::Activo) {
             abort(404);
         }
 
