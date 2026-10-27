@@ -2,12 +2,13 @@
 
 namespace Tests\Feature;
 
-use Database\Seeders\NucleoSeeder;
+use App\Enums\ClavePermiso;
 use App\Enums\Rol;
 use App\Models\Negocio;
 use App\Models\Permiso;
 use App\Models\Usuario;
 use App\Models\UsuarioPermiso;
+use Database\Seeders\NucleoSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -112,7 +113,7 @@ class MigracionesNucleoTest extends TestCase
     public function test_no_se_puede_asignar_dos_veces_el_mismo_permiso_en_el_mismo_negocio(): void
     {
         $dueno = Usuario::factory()->deNegocio()->create();
-        $permiso = Permiso::create(['clave' => 'pedidos.ver', 'tipo_usuario' => 'negocio']);
+        $permiso = Permiso::create(['clave' => ClavePermiso::VerPedidos->value, 'tipo_usuario' => Rol::Negocio->value]);
 
         UsuarioPermiso::create(['usuario_id' => $dueno->id, 'permiso_id' => $permiso->id, 'negocio_id' => $dueno->negocio_id]);
 

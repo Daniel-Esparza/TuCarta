@@ -2,35 +2,23 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permiso;
+use App\Enums\ClavePermiso;
+use App\Enums\Rol;
 use App\Models\Usuario;
-use App\Models\UsuarioPermiso;
 use Illuminate\Database\Seeder;
 
 class PermisosAdministradorSeeder extends Seeder
 {
     public function run(): void
     {
-        $claves = [
-            'gestionar_negocios' => 'Ver y administrar negocios',
-            'gestionar_moderadores' => 'Crear moderadores y asignarles permisos',
-        ];
+        $this->call(PermisosSeeder::class);
 
         $admin = Usuario::where('email', 'admin@tucarta.local')->first();
 
-        foreach ($claves as $clave => $descripcion) {
-            $permiso = Permiso::firstOrCreate(
-                ['clave' => $clave],
-                ['descripcion' => $descripcion, 'tipo_usuario' => 'administrador']
-            );
-
-            // El administrador principal tiene ambos con alcance global.
-            if ($admin) {
-                UsuarioPermiso::firstOrCreate([
-                    'usuario_id' => $admin->id,
-                    'permiso_id' => $permiso->id,
-                    'negocio_id' => null,
-                ]);
+        // El administrador principal tiene todos los de su catálogo con alcance global.
+        if ($admin) {
+            foreach (ClavePermiso::delCatalogo(Rol::Administrador) as $clave) {
+                $admin->otorgarPermiso($clave);
             }
         }
         // moderador@tucarta.local queda sin permisos, a propósito.
