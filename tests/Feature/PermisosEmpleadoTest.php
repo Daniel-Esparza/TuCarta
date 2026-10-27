@@ -20,6 +20,12 @@ class PermisosEmpleadoTest extends TestCase
         $this->seed(PermisosSeeder::class);
     }
 
+    // Las rutas viven en el panel del subdominio del negocio.
+    private function panel(Negocio $negocio, string $ruta): string
+    {
+        return 'http://'.$negocio->subdominio.'.'.config('tucarta.dominio').'/panel'.$ruta;
+    }
+
     /**
      * @param  list<ClavePermiso>  $claves
      */
@@ -41,8 +47,8 @@ class PermisosEmpleadoTest extends TestCase
 
         $this->actingAs($empleado);
 
-        $this->get('/prueba/avanzar-pedidos')->assertOk();
-        $this->get('/prueba/marcar-agotado')->assertOk();
+        $this->get($this->panel($negocio, '/prueba/avanzar-pedidos'))->assertOk();
+        $this->get($this->panel($negocio, '/prueba/marcar-agotado'))->assertOk();
     }
 
     public function test_el_empleado_recibe_403_en_metricas_precios_y_perfil(): void
@@ -52,9 +58,9 @@ class PermisosEmpleadoTest extends TestCase
 
         $this->actingAs($empleado);
 
-        $this->get('/prueba/ver-metricas')->assertForbidden();
-        $this->get('/prueba/editar-precios')->assertForbidden();
-        $this->get('/prueba/editar-perfil')->assertForbidden();
+        $this->get($this->panel($negocio, '/prueba/ver-metricas'))->assertForbidden();
+        $this->get($this->panel($negocio, '/prueba/editar-precios'))->assertForbidden();
+        $this->get($this->panel($negocio, '/prueba/editar-perfil'))->assertForbidden();
     }
 
     public function test_el_empleado_sin_permisos_no_entra_a_ninguna_ruta(): void
@@ -64,9 +70,9 @@ class PermisosEmpleadoTest extends TestCase
 
         $this->actingAs($empleado);
 
-        $this->get('/prueba/avanzar-pedidos')->assertForbidden();
-        $this->get('/prueba/marcar-agotado')->assertForbidden();
-        $this->get('/prueba/ver-metricas')->assertForbidden();
+        $this->get($this->panel($negocio, '/prueba/avanzar-pedidos'))->assertForbidden();
+        $this->get($this->panel($negocio, '/prueba/marcar-agotado'))->assertForbidden();
+        $this->get($this->panel($negocio, '/prueba/ver-metricas'))->assertForbidden();
     }
 
     public function test_el_dueno_con_todos_los_permisos_entra_a_todo(): void
@@ -77,18 +83,21 @@ class PermisosEmpleadoTest extends TestCase
 
         $this->actingAs($dueno);
 
-        $this->get('/prueba/avanzar-pedidos')->assertOk();
-        $this->get('/prueba/marcar-agotado')->assertOk();
-        $this->get('/prueba/ver-metricas')->assertOk();
-        $this->get('/prueba/editar-precios')->assertOk();
-        $this->get('/prueba/editar-perfil')->assertOk();
-        $this->get('/equipo')->assertOk();
+        $this->get($this->panel($negocio, '/prueba/avanzar-pedidos'))->assertOk();
+        $this->get($this->panel($negocio, '/prueba/marcar-agotado'))->assertOk();
+        $this->get($this->panel($negocio, '/prueba/ver-metricas'))->assertOk();
+        $this->get($this->panel($negocio, '/prueba/editar-precios'))->assertOk();
+        $this->get($this->panel($negocio, '/prueba/editar-perfil'))->assertOk();
+        $this->get($this->panel($negocio, '/equipo'))->assertOk();
     }
 
-    public function test_un_invitado_sin_sesion_recibe_403(): void
+    public function test_un_invitado_sin_sesion_va_al_login(): void
     {
-        $this->get('/prueba/avanzar-pedidos')->assertForbidden();
-        $this->get('/equipo')->assertForbidden();
+        $negocio = Negocio::factory()->create();
+        $login = 'http://auth.'.config('tucarta.dominio');
+
+        $this->get($this->panel($negocio, '/prueba/avanzar-pedidos'))->assertRedirect($login);
+        $this->get($this->panel($negocio, '/equipo'))->assertRedirect($login);
     }
 
     public function test_el_permiso_de_otro_negocio_no_abre_la_ruta(): void
@@ -100,7 +109,7 @@ class PermisosEmpleadoTest extends TestCase
         $empleadoDeTacos->otorgarPermiso(ClavePermiso::AvanzarPedidos, $sushi);
 
         $this->actingAs($empleadoDeTacos)
-            ->get('/prueba/avanzar-pedidos')
+            ->get($this->panel($tacos, '/prueba/avanzar-pedidos'))
             ->assertForbidden();
     }
 
@@ -111,7 +120,7 @@ class PermisosEmpleadoTest extends TestCase
         $empleado->otorgarPermiso(ClavePermiso::AvanzarPedidos);
 
         $this->actingAs($empleado)
-            ->get('/prueba/avanzar-pedidos')
+            ->get($this->panel($tacos, '/prueba/avanzar-pedidos'))
             ->assertOk();
     }
 }

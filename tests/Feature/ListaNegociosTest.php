@@ -217,8 +217,14 @@ class ListaNegociosTest extends TestCase
         $dueno = Usuario::factory()->create(['rol' => Rol::Negocio, 'negocio_id' => $negocio->id]);
         $empleado = Usuario::factory()->create(['rol' => Rol::Negocio, 'negocio_id' => $negocio->id]);
 
-        $this->actingAs($dueno)->get(route('negocios.index'))->assertForbidden();
-        $this->actingAs($empleado)->get(route('negocios.index'))->assertForbidden();
+        // Como en todo el panel central, una cuenta de negocio recibe 404 y no 403.
+        $this->actingAs($dueno)->get(route('negocios.index'))->assertNotFound();
+        $this->actingAs($empleado)->get(route('negocios.index'))->assertNotFound();
+    }
+
+    public function test_un_invitado_sin_sesion_va_al_login(): void
+    {
+        $this->get('http://auth.'.config('tucarta.dominio').'/panel/negocios')->assertRedirect('http://auth.'.config('tucarta.dominio'));
     }
 
     public function test_un_moderador_sin_permisos_no_puede_suspender(): void
@@ -232,6 +238,4 @@ class ListaNegociosTest extends TestCase
 
         $this->assertSame('activo', $negocio->fresh()->estado);
     }
-
-    // Nota: falta la prueba del invitado porque dev todavia no tiene la ruta /login (US-01).
 }
