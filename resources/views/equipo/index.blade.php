@@ -75,7 +75,7 @@
             </form>
         </section>
 
-        <a href="{{ url('/') }}"
+        <a href="{{ route('panel.negocio') }}"
            class="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-brand-beigeBorder px-4 py-2.5 font-medium text-brand-dark transition-colors duration-200 hover:bg-brand-beigeCard/50 focus:outline-none focus:ring-2 focus:ring-brand-terracotta focus:ring-offset-2">
             Volver
         </a>

@@ -37,7 +37,7 @@ La primera vez tarda bastante, alrededor de 45 minutos según la computadora y l
 docker compose logs -f laravel.test
 ```
 
-Cuando aparezca `Server running on [http://0.0.0.0:80]`, abre http://localhost. Sal de los logs con `Ctrl+C`.
+Cuando aparezca `Server running on [http://0.0.0.0:80]`, abre http://tucarta.localhost. Sal de los logs con `Ctrl+C`.
 
 Si el puerto 80 está ocupado, usa otro puerto:
 
@@ -47,7 +47,7 @@ Si el puerto 80 está ocupado, usa otro puerto:
 | CMD | `set APP_PORT=8080` y luego `docker compose up -d` |
 | macOS / Linux | `APP_PORT=8080 docker compose up -d` |
 
-y abre http://localhost:8080.
+y abre http://tucarta.localhost:8080.
 
 Para apagarlo: `docker compose down`. Para borrar también la base de datos: `docker compose down -v`.
 
@@ -94,9 +94,9 @@ Para apagarlo: `docker compose down`. Para borrar también la base de datos: `do
    ./vendor/bin/sail npm run dev
    ```
 
-7. Abre http://localhost en el navegador.
+7. Abre http://tucarta.localhost en el navegador.
 
-Si el puerto 80 de tu computadora está ocupado, agrega `APP_PORT=8080` en tu `.env` y abre http://localhost:8080.
+Si el puerto 80 de tu computadora está ocupado, agrega `APP_PORT=8080` en tu `.env` y abre http://tucarta.localhost:8080.
 
 ### Si ya tenías el proyecto instalado
 
@@ -112,7 +112,7 @@ El proyecto cambió de PostgreSQL 18 a PostgreSQL 16 (la versión que define el 
 
 | Qué | Dirección | Notas |
 |---|---|---|
-| Aplicación (HTTP) | http://localhost | Modo normal, sin certificado |
+| Aplicación (HTTP) | http://tucarta.localhost | Modo normal, sin certificado. Usa esta dirección y no `localhost`: la sesión se comparte entre `auth.tucarta.localhost` y los subdominios solo bajo `tucarta.localhost` |
 | Aplicación (HTTPS) | https://tucarta.localhost y https://cualquier-negocio.tucarta.localhost | Requiere activar Traefik y generar el certificado: ver [docs/servidor.md](docs/servidor.md) |
 | Base de datos | `localhost`, puerto `5432` | Base, usuario y contraseña: los de `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD` de tu `.env`. Se puede abrir con DBeaver |
 | Estado de la aplicación | http://localhost/up | Responde 200 si Laravel está arriba |
@@ -121,16 +121,35 @@ Todo lo que termina en `.localhost` lo resuelven los navegadores hacia tu propia
 
 ## Rutas
 
-| Ruta | Qué hace |
-|---|---|
-| `/` | Landing page: qué es TuCarta, cómo funciona el pedido por WhatsApp y el llamado a registrar un negocio |
-| `/up` | Revisión de estado de Laravel |
+El dominio base sale de `TUCARTA_DOMINIO` (`tucarta.localhost` en los escritorios). Lo que distingue cada sección es la dirección, no solo la ruta:
 
-Por ahora todos los subdominios muestran la misma landing. La carta de cada negocio en su subdominio, el inicio de sesión y los paneles llegan en los siguientes sprints.
+| Dirección | Quién | Qué hace |
+|---|---|---|
+| `tucarta.localhost/` | Todos | Landing page |
+| `tucarta.localhost/registrar-negocio` | Todos, sin sesión | Auto-registro de un negocio; queda pendiente de revisión (US-26a) |
+| `auth.tucarta.localhost/` | Todos | Login unificado. Con sesión iniciada, manda al panel de cada quien |
+| `auth.tucarta.localhost/panel` | Administrador y moderadores | Panel central |
+| `auth.tucarta.localhost/panel/negocios` | Administrador y moderadores con `gestionar_negocios` | Lista, búsqueda, filtro, suspender y reactivar negocios (US-03) |
+| `auth.tucarta.localhost/panel/moderadores` | Administrador con `gestionar_moderadores` | Moderadores y sus permisos (US-27) |
+| `{subdominio}.tucarta.localhost/` | Público | Página provisional del negocio (US-02b). El menú llega con US-11 |
+| `{subdominio}.tucarta.localhost/panel` | Dueño y empleados de ese negocio | Panel del negocio: sus categorías |
+| `{subdominio}.tucarta.localhost/panel/categorias/{id}` | Dueño y empleados de ese negocio | Productos de una categoría |
+| `{subdominio}.tucarta.localhost/panel/equipo` | Dueño con `gestionar_equipo` | Equipo de trabajo: alta y desactivación de empleados (US-23) |
+| `{subdominio}.tucarta.localhost/panel/prueba/...` | Según el permiso | Rutas de prueba de cada permiso hasta que existan sus pantallas (US-23) |
+| `/up` | Todos | Revisión de estado de Laravel |
+
+Reglas:
+
+- Los subdominios `auth`, `www`, `admin`, `api`, `app` y `mail` están reservados y nunca son un negocio.
+- Un negocio activo abre su página. Uno suspendido muestra un aviso, sin borrar su información. Uno pendiente, rechazado o que no existe responde la misma página 404, para no revelar cuál es cuál (US-02b).
+- Sin sesión, los paneles mandan al login unificado.
+- Quien no pertenece a un negocio, o intenta abrir algo de otro negocio cambiando la dirección, recibe **404, nunca 403**: no se confirma que exista. Quien sí pertenece pero no tiene el permiso recibe 403.
+
+Los detalles de cómo se separa la información y las reglas para conectar las demás historias están en [docs/seguridad-por-negocio.md](docs/seguridad-por-negocio.md).
 
 ## Funcionamiento actual
 
-Hasta el cierre del Sprint 4 el proyecto tiene:
+Hasta ahora el proyecto tiene:
 
 - **Base de datos completa del modelo del Sprint 2**, en migraciones de Laravel:
   - Núcleo: `negocios`, `usuarios`, `permisos`, `usuario_permisos`.
@@ -138,8 +157,14 @@ Hasta el cierre del Sprint 4 el proyecto tiene:
   - Pedidos: `pedidos`, `pedido_items`, `pedido_item_opciones`, `pedido_estado_historial`, con los tipos `tipo_entrega` y `estado_pedido`.
 - **Datos de prueba** (usuarios y negocios, ver abajo) que se cargan con `migrate --seed`.
 - **HTTPS local** con Traefik y mkcert, con redirección automática de HTTP a HTTPS.
-- **Landing page** pública.
+- **Landing page** pública, con enlace al auto-registro (US-26a) y al login.
 - **Pruebas automáticas** que corren en cada Pull Request con PostgreSQL 16.
+- **Separación por negocio** (US-04): cada subdominio resuelve su negocio, los modelos con `negocio_id` filtran solos y PostgreSQL aplica Row Level Security en las 9 tablas con `negocio_id`.
+- **Catálogo de permisos** (US-04), con moderadores (US-27) y empleados (US-23), ver abajo.
+- **Login unificado** en `auth.tucarta.localhost`: cada cuenta llega a su panel, bloqueo de 5 minutos tras 5 intentos fallidos y cierre de sesión. La sesión vale en todos los subdominios (decisión D4).
+- **Panel central**: lista y estado de negocios con búsqueda, filtro, paginación, suspender y reactivar (US-03).
+- **Dirección de cada negocio según su estado** (US-02b) y **auto-registro público** que deja el negocio pendiente (US-26a).
+- **Kit de diseño** del panel (US-34), ver [docs/kit-diseno.md](docs/kit-diseno.md).
 
 Las cuentas usan un tipo base en `usuarios.rol`: `administrador`, `negocio` o `cliente`. El moderador y el empleado no son tipos aparte: son un administrador o un negocio con menos permisos en `usuario_permisos`.
 
@@ -157,8 +182,49 @@ La contraseña de todas las cuentas es `password`.
 | `moderador@tucarta.local` | administrador | Moderador sin ningún permiso asignado |
 | `juan@tacos-juan.tucarta.local` | negocio | Dueño de Tacos Juan |
 | `ana@sushi-ana.tucarta.local` | negocio | Dueña de Sushi Ana |
+| `marco@tacos-juan.tucarta.local` | negocio | Empleado de Tacos Juan: solo avanza pedidos y marca agotados |
 
-Las cuentas del personal de un negocio usan el formato `nombre@subdominio.tucarta.local`. El inicio de sesión todavía no está disponible: las cuentas ya existen en la base para cuando llegue.
+Las cuentas del personal de un negocio usan el formato `nombre@subdominio.tucarta.local`. Todas inician sesión en http://auth.tucarta.localhost y llegan a su panel: el administrador y el moderador a `auth.tucarta.localhost/panel`, cada dueño o empleado a `{subdominio}.tucarta.localhost/panel`.
+
+### Permisos
+
+El catálogo vive en `App\Enums\ClavePermiso` y se carga con el seeder. Cada permiso pertenece a un catálogo: una cuenta de negocio nunca puede recibir un permiso de administrador, ni al revés.
+
+| Clave | Catálogo | Qué permite |
+|---|---|---|
+| `ver_pedidos` | negocio | Ver los pedidos del negocio |
+| `avanzar_pedidos` | negocio | Cambiar el estado de los pedidos |
+| `marcar_agotado` | negocio | Marcar productos como agotados o disponibles |
+| `ver_metricas` | negocio | Ver las métricas y el ticket promedio |
+| `editar_precios` | negocio | Editar productos y precios |
+| `editar_perfil` | negocio | Editar el perfil del negocio |
+| `gestionar_equipo` | negocio | Dar de alta y desactivar empleados |
+| `gestionar_negocios` | administrador | Administrar negocios de la plataforma |
+| `gestionar_moderadores` | administrador | Crear moderadores y asignarles permisos |
+
+Un permiso asignado con `negocio_id` vacío es **global** y aplica a todos los negocios, incluidos los que se creen después.
+
+En los datos de prueba:
+
+- `admin@tucarta.local` tiene los dos permisos de administrador, globales.
+- `moderador@tucarta.local` no tiene ninguno.
+- Cada dueño tiene los siete permisos de negocio, solo sobre su propio negocio.
+- `marco@tacos-juan.tucarta.local` tiene `avanzar_pedidos` y `marcar_agotado` en Tacos Juan.
+
+Para usarlos en el código siempre con el enum, nunca con texto:
+
+```php
+use App\Enums\ClavePermiso;
+
+$usuario->tienePermiso(ClavePermiso::VerPedidos);              // en su propio negocio
+$usuario->tienePermiso(ClavePermiso::GestionarNegocios, $negocio);
+$usuario->tienePermisoGlobal(ClavePermiso::GestionarModeradores);
+$empleado->otorgarPermiso(ClavePermiso::MarcarAgotado, $negocio, $dueno);
+$empleado->quitarPermiso(ClavePermiso::MarcarAgotado, $negocio);
+$dueno->otorgarPermisosDeDueno();                              // los siete de su negocio
+```
+
+En las rutas: `->middleware('permiso:marcar_agotado')`. La clave tiene que existir en el enum.
 
 ### Negocios
 
@@ -212,6 +278,7 @@ git push -u origin feature/US-32-migraciones-nucleo
 ## Documentación
 
 - [docs/servidor.md](docs/servidor.md): dominio, HTTPS con Traefik y mkcert, y los pasos para el servidor del equipo.
+- [docs/seguridad-por-negocio.md](docs/seguridad-por-negocio.md): separación por negocio, RLS y reglas para conectar las demás historias.
 
 ## Equipo
 

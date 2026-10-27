@@ -2,31 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Negocio;
-use Symfony\Component\HttpFoundation\Response;
+use App\Support\NegocioActual;
+use Illuminate\View\View;
 
 class NegocioPublicoController extends Controller
 {
-    // El panel central vive en auth.{dominio} y no es un negocio.
-    private const SUBDOMINIO_CENTRAL = 'auth';
-
     /**
-     * US-02b: la direccion del negocio responde segun su estado.
-     * Pendiente, rechazado e inexistente muestran la misma pagina,
-     * para no revelar cual de los tres es.
+     * US-02b: la dirección de un negocio activo muestra su página provisional.
+     * Los demás estados los resuelve el middleware "negocio" antes de llegar aquí.
      */
-    public function mostrar(string $subdominio): Response
+    public function mostrar(NegocioActual $negocioActual): View
     {
-        if ($subdominio === self::SUBDOMINIO_CENTRAL) {
-            return redirect('/panel');
-        }
-
-        $negocio = Negocio::where('subdominio', $subdominio)->first();
-
-        return match ($negocio?->estado) {
-            'activo' => response()->view('negocio.provisional', ['negocio' => $negocio]),
-            'suspendido' => response()->view('negocio.suspendido', ['negocio' => $negocio]),
-            default => response()->view('negocio.no-disponible', [], 404),
-        };
+        return view('negocio.provisional', ['negocio' => $negocioActual->negocio()]);
     }
 }
