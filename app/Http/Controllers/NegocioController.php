@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClavePermiso;
 use App\Models\Negocio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,8 +21,8 @@ class NegocioController extends Controller
         abort_unless($usuario->esAdministrador(), 403);
 
         $negocios = Negocio::query()
-            ->when(! $usuario->tienePermisoGlobal('gestionar_negocios'), fn ($q) => $q
-                ->whereIn('id', $usuario->negociosConPermiso('gestionar_negocios')))
+            ->when(! $usuario->tienePermisoGlobal(ClavePermiso::GestionarNegocios), fn ($q) => $q
+                ->whereIn('id', $usuario->negociosConPermiso(ClavePermiso::GestionarNegocios)))
             ->when($request->filled('q'), fn ($q) => $q->where(fn ($w) => $w
                 ->where('nombre', 'ilike', '%'.$request->string('q').'%')
                 ->orWhere('subdominio', 'ilike', '%'.$request->string('q').'%')))

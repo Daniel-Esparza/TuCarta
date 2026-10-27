@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClavePermiso;
 use App\Enums\Rol;
 use App\Models\Negocio;
-use App\Models\Permiso;
 use App\Models\Usuario;
-use App\Models\UsuarioPermiso;
+use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,18 +14,16 @@ class ListaNegociosTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function darPermiso(Usuario $usuario, string $clave, ?Negocio $negocio = null): UsuarioPermiso
+    protected function setUp(): void
     {
-        $permiso = Permiso::firstOrCreate(
-            ['clave' => $clave],
-            ['descripcion' => $clave, 'tipo_usuario' => 'administrador']
-        );
+        parent::setUp();
 
-        return UsuarioPermiso::create([
-            'usuario_id' => $usuario->id,
-            'permiso_id' => $permiso->id,
-            'negocio_id' => $negocio?->id,
-        ]);
+        $this->seed(PermisosSeeder::class);
+    }
+
+    private function darPermiso(Usuario $usuario, ?Negocio $negocio = null): void
+    {
+        $usuario->otorgarPermiso(ClavePermiso::GestionarNegocios, $negocio);
     }
 
     private function crearItems(Negocio $negocio, int $cantidad): void
@@ -45,7 +43,7 @@ class ListaNegociosTest extends TestCase
     public function test_el_administrador_con_permiso_global_ve_todos_los_negocios_en_orden(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         Negocio::factory()->create(['nombre' => 'Tacos Zafiro']);
         Negocio::factory()->create(['nombre' => 'Antojitos La Esquina']);
@@ -59,7 +57,7 @@ class ListaNegociosTest extends TestCase
     public function test_la_tabla_muestra_los_cinco_datos_de_cada_negocio(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         $negocio = Negocio::factory()->create(['nombre' => 'Tacos Zafiro', 'subdominio' => 'tacos-zafiro']);
         $this->crearItems($negocio, 12);
@@ -79,7 +77,7 @@ class ListaNegociosTest extends TestCase
     public function test_la_busqueda_por_nombre_regresa_lo_correcto(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         Negocio::factory()->create(['nombre' => 'Tacos Zafiro', 'subdominio' => 'zafiro']);
         Negocio::factory()->create(['nombre' => 'Sushi Maru', 'subdominio' => 'maru']);
@@ -94,7 +92,7 @@ class ListaNegociosTest extends TestCase
     public function test_la_busqueda_por_direccion_web_regresa_lo_correcto(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         Negocio::factory()->create(['nombre' => 'La Fogata', 'subdominio' => 'fogata-abc123']);
         Negocio::factory()->create(['nombre' => 'El Corral', 'subdominio' => 'corral']);
@@ -109,7 +107,7 @@ class ListaNegociosTest extends TestCase
     public function test_el_filtro_por_estado_regresa_lo_correcto(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         Negocio::factory()->create(['nombre' => 'Antojitos Pancha', 'estado' => 'activo']);
         Negocio::factory()->pendiente()->create(['nombre' => 'Marisqueria Puerto']);
@@ -126,7 +124,7 @@ class ListaNegociosTest extends TestCase
     public function test_con_21_negocios_la_primera_pagina_muestra_20_y_existe_la_segunda(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         foreach (range(1, 21) as $i) {
             Negocio::factory()->create(['nombre' => 'Negocio '.str_pad((string) $i, 2, '0', STR_PAD_LEFT)]);
@@ -146,7 +144,7 @@ class ListaNegociosTest extends TestCase
     public function test_suspender_cambia_el_estado_y_deja_intactos_los_productos(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         $negocio = Negocio::factory()->create(['nombre' => 'Tacos Zafiro']);
         $this->crearItems($negocio, 3);
@@ -162,7 +160,7 @@ class ListaNegociosTest extends TestCase
     public function test_reactivar_lo_regresa_a_activo(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         $negocio = Negocio::factory()->create(['estado' => 'suspendido']);
 
@@ -176,7 +174,7 @@ class ListaNegociosTest extends TestCase
     public function test_una_peticion_get_a_suspender_no_cambia_nada(): void
     {
         $admin = Usuario::factory()->administrador()->create();
-        $this->darPermiso($admin, 'gestionar_negocios');
+        $this->darPermiso($admin);
 
         $negocio = Negocio::factory()->create();
 
@@ -192,7 +190,7 @@ class ListaNegociosTest extends TestCase
         $moderador = Usuario::factory()->administrador()->create();
         $tacos = Negocio::factory()->create(['nombre' => 'Tacos Zafiro']);
         Negocio::factory()->create(['nombre' => 'Sushi Maru']);
-        $this->darPermiso($moderador, 'gestionar_negocios', $tacos);
+        $this->darPermiso($moderador, $tacos);
 
         $this->actingAs($moderador)
             ->get(route('negocios.index'))
