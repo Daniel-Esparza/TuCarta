@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ClavePermiso;
+use App\Enums\EstadoNegocio;
 use App\Enums\Rol;
 use App\Models\Negocio;
 use App\Models\Permiso;
@@ -55,7 +56,7 @@ class MigracionesNucleoTest extends TestCase
             'categoria' => 'Tacos',
         ])->fresh();
 
-        $this->assertSame('pendiente', $negocio->estado);
+        $this->assertSame(EstadoNegocio::Pendiente, $negocio->estado);
         $this->assertSame('America/Mexico_City', $negocio->zona_horaria);
         $this->assertFalse($negocio->cerrado_temporal);
 

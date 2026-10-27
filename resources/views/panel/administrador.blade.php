@@ -34,7 +34,7 @@
                 <tr>
                     <td>{{ $negocio->nombre }}</td>
                     <td>{{ $negocio->subdominio }}</td>
-                    <td>{{ $negocio->estado }}</td>
+                    <td>{{ $negocio->estado->etiqueta() }}</td>
                 </tr>
             @endforeach
         </tbody>
