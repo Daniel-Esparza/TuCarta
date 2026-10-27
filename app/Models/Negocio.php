@@ -51,4 +51,9 @@ class Negocio extends Model
     {
         return $this->hasMany(Horario::class, 'negocio_id');
     }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class, 'negocio_id');
+    }
 }

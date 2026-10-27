@@ -36,9 +36,9 @@ class NegocioPolicy
 
     public function update(Usuario $usuario, Negocio $negocio): bool
     {
-        return false;
+        return $this->view($usuario, $negocio);
     }
-
+    
     public function delete(Usuario $usuario, Negocio $negocio): bool
     {
         return false;
