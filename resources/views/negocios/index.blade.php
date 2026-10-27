@@ -6,6 +6,10 @@
             <p class="text-sm text-brand-dark/70">Busca, filtra, suspende o reactiva los negocios de la plataforma.</p>
         </header>
 
+        @can('create', App\Models\Negocio::class)
+            <x-button :href="route('negocios.create')">Dar de alta un negocio</x-button>
+        @endcan
+
         @if (session('estado'))
             <x-alerta>{{ session('estado') }}</x-alerta>
         @endif
