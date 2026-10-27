@@ -46,3 +46,6 @@ Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(fu
     Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
     Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
 });
+// US-26a: auto-registro publico de negocios (sin sesion).
+Route::get('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
+Route::post('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
