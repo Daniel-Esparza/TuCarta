@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioPublicoController;
 use Illuminate\Support\Facades\Route;
 
-// US-02b: la direccion de cada negocio ({subdominio}.{dominio}) segun su estado.
-// Va antes de la landing, que responde en cualquier host.
+
+
 Route::domain('{subdominio}.'.config('tucarta.dominio'))
     ->get('/', [NegocioPublicoController::class, 'mostrar'])
     ->name('negocio.publico');
@@ -46,6 +47,12 @@ Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(fu
     Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
     Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
 });
-// US-26a: auto-registro publico de negocios (sin sesion).
+
 Route::get('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
 Route::post('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
+
+
+Route::middleware('permiso:editar_perfil')->group(function () {
+    Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::patch('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
+});
