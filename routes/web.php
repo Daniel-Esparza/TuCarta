@@ -63,3 +63,16 @@ Route::get('/entrar-prueba/{email}', function (string $email) {
 
     return redirect('/horarios');
 });
+// US-19b: cierre temporal del negocio (dueño).
+Route::middleware('permiso:editar_perfil')->prefix('cierre-temporal')->name('cierre-temporal.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CierreTemporalController::class, 'index'])->name('index');
+    Route::patch('/cerrar', [\App\Http\Controllers\CierreTemporalController::class, 'cerrar'])->name('cerrar');
+    Route::patch('/reabrir', [\App\Http\Controllers\CierreTemporalController::class, 'reabrir'])->name('reabrir');
+});
+
+// US-19b: ruta de prueba. Todavia no existe el envio real de pedidos; cuando exista,
+// el middleware EnsureNegocioAbierto se pone en esa ruta.
+Route::domain('{subdominio}.'.config('tucarta.dominio'))
+    ->get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
+    ->middleware(\App\Http\Middleware\EnsureNegocioAbierto::class)
+    ->name('prueba.enviar-pedido');
