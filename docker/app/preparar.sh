@@ -21,6 +21,14 @@ if ! grep -qE '^APP_KEY=.+' .env; then
     como_usuario php artisan key:generate --force
 fi
 
+# Estilos y scripts compilados (el layout usa @vite). Con npm run dev no hace falta.
+if [ ! -f public/build/manifest.json ] && [ ! -f public/hot ]; then
+    if [ ! -x node_modules/.bin/vite ]; then
+        como_usuario npm install --no-audit --no-fund
+    fi
+    como_usuario npm run build
+fi
+
 for intento in $(seq 1 30); do
     if estado=$(como_usuario php artisan migrate:status 2>&1); then
         break

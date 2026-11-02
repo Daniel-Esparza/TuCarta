@@ -1,15 +1,19 @@
 <?php
 
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\EquipoController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ModeradorController;
+use App\Http\Controllers\NegocioPublicoController;
+use Illuminate\Support\Facades\Route;
+
+
+
+Route::domain('{subdominio}.'.config('tucarta.dominio'))
+    ->get('/', [NegocioPublicoController::class, 'mostrar'])
+    ->name('negocio.publico');
 
 Route::view('/', 'landing')->name('landing');
-
-/*
-US-23: Equipo de trabajo del dueño (alta y desactivación de empleados)
-*/
 
 Route::middleware('permiso:gestionar_equipo')->group(function () {
     Route::get('/equipo', [EquipoController::class, 'index'])->name('equipo.index');
@@ -42,4 +46,13 @@ Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(fu
     Route::get('/', [NegocioController::class, 'index'])->name('index');
     Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
     Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
+});
+
+Route::get('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
+Route::post('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
+
+
+Route::middleware('permiso:editar_perfil')->group(function () {
+    Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::patch('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
 });

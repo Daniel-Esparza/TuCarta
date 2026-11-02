@@ -1,6 +1,5 @@
 <x-layouts.app title="Equipo de trabajo">
     <div class="flex flex-col gap-6">
-
         {{-- Encabezado --}}
         <header class="flex flex-col gap-1">
             <p class="text-xs font-bold uppercase tracking-widest text-brand-terracotta">Panel del negocio</p>
@@ -13,15 +12,12 @@
 
         {{-- Mensaje de éxito --}}
         @if (session('exito'))
-            <p class="rounded-xl border border-brand-teal/40 bg-brand-teal/10 px-4 py-3 text-sm font-semibold text-brand-teal">
-                {{ session('exito') }}
-            </p>
+            <x-alerta>{{ session('exito') }}</x-alerta>
         @endif
 
         {{-- Lista del equipo --}}
         <section class="flex flex-col gap-3">
             <h2 class="text-xs font-bold uppercase tracking-widest">Tu equipo</h2>
-
             @forelse ($equipo as $miembro)
                 <article class="rounded-2xl border border-brand-beigeBorder bg-brand-beigeInput px-4 py-3">
                     <div class="flex items-start justify-between gap-3">
@@ -29,7 +25,6 @@
                             <p class="truncate text-sm font-bold">{{ $miembro->nombre }} {{ $miembro->apellidos }}</p>
                             <p class="truncate text-xs text-brand-dark/70">{{ $miembro->email }}</p>
                         </div>
-
                         @if ($miembro->id === $duenoId)
                             <span class="shrink-0 rounded-full border border-brand-beigeBorder bg-brand-beigeCard px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">Dueño</span>
                         @elseif ($miembro->estado === 'inactivo')
@@ -50,12 +45,13 @@
                     @endif
 
                     @if ($miembro->id !== $duenoId && $miembro->estado === 'activo')
-                        <form method="POST" action="{{ route('equipo.desactivar', $miembro) }}" class="mt-3"
-                              onsubmit="return confirm('¿Desactivar a {{ $miembro->nombre }}? Ya no podrá iniciar sesión.')">
-                            @csrf
-                            @method('PATCH')
-                            <x-button variant="outline">[ DESACTIVAR ]</x-button>
-                        </form>
+                        <div class="mt-3">
+                            <x-confirmar :accion="route('equipo.desactivar', $miembro)" metodo="PATCH"
+                                         etiqueta="Desactivar"
+                                         :titulo="'Desactivar a ' . $miembro->nombre"
+                                         mensaje="Ya no podrá iniciar sesión."
+                                         confirmar="Desactivar" />
+                        </div>
                     @endif
                 </article>
             @empty
@@ -68,39 +64,20 @@
         {{-- Alta de empleado --}}
         <section class="flex flex-col gap-4">
             <h2 class="text-xs font-bold uppercase tracking-widest">Nuevo empleado</h2>
-
             <form method="POST" action="{{ route('equipo.store') }}" class="flex flex-col gap-4">
                 @csrf
-
-                <div>
-                    <x-input name="nombre" label="Nombre" placeholder="Nombre" :value="old('nombre')" required />
-                    @error('nombre')<p class="mt-1 text-xs font-semibold text-brand-terracotta">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <x-input name="apellidos" label="Apellidos" placeholder="Apellidos" :value="old('apellidos')" required />
-                    @error('apellidos')<p class="mt-1 text-xs font-semibold text-brand-terracotta">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <x-input name="email" label="Correo" type="email" placeholder="empleado@correo.com" :value="old('email')" required />
-                    @error('email')<p class="mt-1 text-xs font-semibold text-brand-terracotta">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <x-input name="telefono_whatsapp" label="Teléfono de WhatsApp" type="tel" placeholder="+52 55 1234 5678" :value="old('telefono_whatsapp')" required />
-                    @error('telefono_whatsapp')<p class="mt-1 text-xs font-semibold text-brand-terracotta">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <x-input name="password" label="Contraseña temporal" type="password" placeholder="Mínimo 8 caracteres" required />
-                    @error('password')<p class="mt-1 text-xs font-semibold text-brand-terracotta">{{ $message }}</p>@enderror
-                </div>
-
-                <x-button variant="terracotta">[ + CREAR EMPLEADO ]</x-button>
+                <x-campo nombre="nombre" etiqueta="Nombre" required />
+                <x-campo nombre="apellidos" etiqueta="Apellidos" required />
+                <x-campo nombre="email" etiqueta="Correo" tipo="email" placeholder="empleado@correo.com" required />
+                <x-campo nombre="telefono_whatsapp" etiqueta="Teléfono de WhatsApp" tipo="tel" placeholder="+52 55 1234 5678" required />
+                <x-campo nombre="password" etiqueta="Contraseña temporal" tipo="password" placeholder="Mínimo 8 caracteres" required />
+                <x-button type="submit" variant="terracotta">Crear empleado</x-button>
             </form>
         </section>
 
-        <x-button variant="outline" href="/">[ VOLVER ]</x-button>
+        <a href="{{ url('/') }}"
+           class="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-brand-beigeBorder px-4 py-2.5 font-medium text-brand-dark transition-colors duration-200 hover:bg-brand-beigeCard/50 focus:outline-none focus:ring-2 focus:ring-brand-terracotta focus:ring-offset-2">
+            Volver
+        </a>
     </div>
 </x-layouts.app>
