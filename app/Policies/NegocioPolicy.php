@@ -28,10 +28,12 @@ class NegocioPolicy
             && $usuario->tienePermiso(ClavePermiso::GestionarNegocios, $negocio);
     }
 
-    // US-27 solo cubre la consulta. Crear, editar y borrar negocios no se abre.
+    // US-02a: dar de alta negocios pide el permiso global; uno sobre un solo
+    // negocio no alcanza. Borrar sigue cerrado.
     public function create(Usuario $usuario): bool
     {
-        return false;
+        return $usuario->esAdministrador()
+            && $usuario->tienePermisoGlobal(ClavePermiso::GestionarNegocios);
     }
 
     public function update(Usuario $usuario, Negocio $negocio): bool

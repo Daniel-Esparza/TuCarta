@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AltaNegocioController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AutoRegistroNegocioController;
 use App\Http\Controllers\EquipoController;
@@ -30,9 +31,11 @@ Route::domain('auth.'.$dominio)->group(function () {
             Route::delete('{moderador}/permisos/{asignacion}', [ModeradorController::class, 'quitarPermiso'])->name('permisos.destroy');
         });
 
-        // US-03: lista y estado de negocios
+        // US-03: lista y estado de negocios. US-02a: alta de negocio
         Route::prefix('negocios')->name('negocios.')->group(function () {
             Route::get('/', [NegocioController::class, 'index'])->name('index');
+            Route::get('/crear', [AltaNegocioController::class, 'create'])->name('create');
+            Route::post('/', [AltaNegocioController::class, 'store'])->name('store');
             Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
             Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
         });
