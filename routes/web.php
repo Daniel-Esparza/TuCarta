@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\ModeradorController;
@@ -19,6 +20,15 @@ Route::middleware('permiso:gestionar_equipo')->group(function () {
     Route::post('/equipo', [EquipoController::class, 'store'])->name('equipo.store');
     Route::patch('/equipo/{empleado}/desactivar', [EquipoController::class, 'desactivar'])
         ->name('equipo.desactivar');
+});
+
+Route::middleware('permiso:editar_perfil')->prefix('categorias')->name('categorias.')->group(function () {
+    Route::get('/', [CategoriaController::class, 'index'])->name('index');
+    Route::post('/', [CategoriaController::class, 'store'])->name('store');
+    Route::put('{categoria}', [CategoriaController::class, 'update'])->name('update');
+    Route::delete('{categoria}', [CategoriaController::class, 'destroy'])->name('destroy');
+    Route::patch('{categoria}/subir', [CategoriaController::class, 'subir'])->name('subir');
+    Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
 });
 
 Route::get('/prueba/avanzar-pedidos', fn () => 'Permiso avanzar_pedidos: OK')
@@ -45,4 +55,11 @@ Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(fu
     Route::get('/', [NegocioController::class, 'index'])->name('index');
     Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
     Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
+});
+// Ruta temporal para iniciar sesión como dueño de negocio
+
+Route::get('/login-local', function () {
+    $dueno = \App\Models\Usuario::where('correo', 'dueno@tacosjuan.com')->first();
+    auth()->login($dueno);
+    return redirect('/equipo');
 });
