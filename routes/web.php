@@ -1,17 +1,12 @@
 <?php
 
-<<<<<<< HEAD
 use App\Http\Controllers\CategoriaController;
-=======
-use App\Http\Controllers\PerfilController;
->>>>>>> origin/main
-use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\ModeradorController;
+use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\NegocioPublicoController;
+use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
-
-
 
 Route::domain('{subdominio}.'.config('tucarta.dominio'))
     ->get('/', [NegocioPublicoController::class, 'mostrar'])
@@ -46,35 +41,30 @@ Route::get('/prueba/editar-precios', fn () => 'Permiso editar_precios: OK')
 Route::get('/prueba/editar-perfil', fn () => 'Permiso editar_perfil: OK')
     ->middleware('permiso:editar_perfil')->name('prueba.editar-perfil');
 
-    Route::middleware('auth')->prefix('admin/moderadores')->name('moderadores.')->group(function () {
+Route::middleware('auth')->prefix('admin/moderadores')->name('moderadores.')->group(function () {
     Route::get('/', [ModeradorController::class, 'index'])->name('index');
     Route::post('/', [ModeradorController::class, 'store'])->name('store');
     Route::post('{moderador}/permisos', [ModeradorController::class, 'asignarPermiso'])->name('permisos.store');
     Route::delete('{moderador}/permisos/{asignacion}', [ModeradorController::class, 'quitarPermiso'])->name('permisos.destroy');
 });
 
-
-
 Route::middleware('auth')->prefix('admin/negocios')->name('negocios.')->group(function () {
     Route::get('/', [NegocioController::class, 'index'])->name('index');
     Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
     Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
 });
-<<<<<<< HEAD
-// Ruta temporal para iniciar sesión como dueño de negocio
 
+// Ruta temporal para iniciar sesión como dueño de negocio
 Route::get('/login-local', function () {
     $dueno = \App\Models\Usuario::where('correo', 'dueno@tacosjuan.com')->first();
     auth()->login($dueno);
     return redirect('/equipo');
-=======
+});
 
 Route::get('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
 Route::post('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
 
-
 Route::middleware('permiso:editar_perfil')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
     Route::patch('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
->>>>>>> origin/main
 });
