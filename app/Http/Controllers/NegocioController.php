@@ -22,16 +22,16 @@ class NegocioController extends Controller
         abort_unless($usuario->esAdministrador(), 403);
 
         $negocios = Negocio::query()
-            ->when(! $usuario->tienePermisoGlobal('gestionar_negocios'), fn ($q) => $q
-                ->whereIn('id', $usuario->negociosConPermiso('gestionar_negocios')))
+            ->when(! $usuario->tienePermisoGlobal(ClavePermiso::GestionarNegocios), fn ($q) => $q
+                ->whereIn('id', $usuario->negociosConPermiso(ClavePermiso::GestionarNegocios)))
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = '%'.mb_strtolower($request->string('q')).'%';
                 return $q->where(fn ($w) => $w
                     ->whereRaw('lower(nombre) like ?', [$term])
                     ->orWhereRaw('lower(subdominio) like ?', [$term]));
             })
-            ->when(in_array($request->estado, ['activo', 'pendiente', 'suspendido', 'rechazado'], true),
-                fn ($q) => $q->where('estado', $request->estado))
+            ->when(EstadoNegocio::tryFrom((string) $request->estado),
+                fn ($q, $estado) => $q->where('estado', $estado))
             ->withCount('items')
             ->orderBy('nombre')
             ->paginate(20)

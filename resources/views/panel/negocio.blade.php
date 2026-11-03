@@ -18,6 +18,13 @@
         <p><a href="{{ route('equipo.index') }}">Equipo de trabajo</a></p>
     @endif
 
+    @if (auth()->user()->tienePermiso(App\Enums\ClavePermiso::EditarPerfil))
+        <p><a href="{{ route('perfil.edit') }}">Perfil del negocio</a></p>
+        <p><a href="{{ route('categorias.index') }}">Categorías del menú</a></p>
+        <p><a href="{{ route('horarios.index') }}">Horarios de atención</a></p>
+        <p><a href="{{ route('cierre-temporal.index') }}">Cierre temporal</a></p>
+    @endif
+
     <h2>Categorías</h2>
     @if ($categorias->isEmpty())
         <p>Este negocio todavía no tiene categorías.</p>

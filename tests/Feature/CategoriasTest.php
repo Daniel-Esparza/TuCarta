@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClavePermiso;
 use App\Models\Categoria;
 use App\Models\Item;
 use App\Models\Negocio;
-use App\Models\Permiso;
 use App\Models\Usuario;
+use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class CategoriasTest extends TestCase
@@ -18,13 +20,11 @@ class CategoriasTest extends TestCase
     {
         $negocio = Negocio::factory()->create();
         $dueno = Usuario::factory()->deNegocio($negocio)->create();
-        $dueno->permisos()->create([
-            'permiso_id' => Permiso::firstOrCreate(
-                ['clave' => 'editar_perfil'],
-                ['descripcion' => 'Editar el perfil del negocio', 'tipo_usuario' => 'negocio']
-            )->id,
-            'negocio_id' => $negocio->id,
-        ]);
+        $this->seed(PermisosSeeder::class);
+        $dueno->otorgarPermiso(ClavePermiso::EditarPerfil, $negocio);
+
+        // Las rutas del panel viven en el subdominio del negocio.
+        URL::defaults(['subdominio' => $negocio->subdominio]);
 
         return [$negocio, $dueno];
     }
@@ -231,5 +231,9 @@ class CategoriasTest extends TestCase
 
         $this->actingAs($empleado)->get(route('categorias.index'))->assertForbidden();
         $this->actingAs($empleado)->post(route('categorias.store'), ['nombre' => 'X'])->assertForbidden();
+
+        auth()->logout();
+        $this->get('http://'.$negocio->subdominio.'.'.config('tucarta.dominio').'/panel/categorias')
+            ->assertRedirect('http://auth.'.config('tucarta.dominio'));
     }
 }

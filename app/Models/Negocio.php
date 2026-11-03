@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoNegocio;
 use Carbon\CarbonInterface;
 use Database\Factories\NegocioFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;

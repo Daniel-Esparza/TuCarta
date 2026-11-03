@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Negocio;
+use App\Rules\Whatsapp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +12,7 @@ use Illuminate\View\View;
 /**
  * US-05: pantalla donde el dueño edita los datos de su negocio.
  * El negocio SIEMPRE sale de la sesion: no hay id en la URL ni en la
- * peticion, asi que un dueñ    o no puede tocar el perfil de otro negocio.
+ * peticion, asi que un dueño no puede tocar el perfil de otro negocio.
  */
 class PerfilController extends Controller
 {
@@ -26,14 +27,14 @@ class PerfilController extends Controller
 
 
         $request->merge([
-            'telefono_whatsapp' => preg_replace('/[\s\-().]/', '', (string) $request->input('telefono_whatsapp')),
+            'telefono_whatsapp' => Whatsapp::normalizar($request->input('telefono_whatsapp')),
         ]);
 
         $datos = $request->validate([
             'nombre' => ['required', 'string', 'max:255'],
             'descripcion' => ['nullable', 'string', 'max:255'],
             'direccion' => ['required', 'string', 'max:255'],
-            'telefono_whatsapp' => ['required', 'regex:/^\+\d{11,13}$/'],
+            'telefono_whatsapp' => ['required', new Whatsapp],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'nombre.required' => 'Escribe el nombre de tu negocio.',
@@ -42,7 +43,6 @@ class PerfilController extends Controller
             'direccion.required' => 'Escribe la dirección de tu negocio.',
             'direccion.max' => 'La dirección es demasiado larga.',
             'telefono_whatsapp.required' => 'Escribe tu número de WhatsApp.',
-            'telefono_whatsapp.regex' => 'Escribe el WhatsApp con lada y 10 dígitos, por ejemplo +524441234567.',
             'logo.image' => 'El logo debe ser una imagen.',
             'logo.mimes' => 'El logo debe ser una imagen JPG, PNG o WebP.',
             'logo.max' => 'El logo no puede pasar de 2 MB.',

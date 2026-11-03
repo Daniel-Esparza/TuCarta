@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClavePermiso;
 use App\Models\Negocio;
-use App\Models\Permiso;
 use App\Models\Usuario;
-use App\Models\UsuarioPermiso;
+use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -15,18 +16,19 @@ class PerfilNegocioTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(PermisosSeeder::class);
+    }
+
     private function darPermiso(Usuario $usuario, string $clave, Negocio $negocio): void
     {
-        $permiso = Permiso::firstOrCreate(
-            ['clave' => $clave],
-            ['descripcion' => $clave, 'tipo_usuario' => 'negocio']
-        );
+        $usuario->otorgarPermiso(ClavePermiso::from($clave), $negocio);
 
-        UsuarioPermiso::firstOrCreate([
-            'usuario_id' => $usuario->id,
-            'permiso_id' => $permiso->id,
-            'negocio_id' => $negocio->id,
-        ]);
+        // Las rutas del panel viven en el subdominio del negocio.
+        URL::defaults(['subdominio' => $negocio->subdominio]);
     }
 
     private function dueno(Negocio $negocio): Usuario
@@ -218,9 +220,18 @@ class PerfilNegocioTest extends TestCase
             ->assertDontSee('Comida rapida');
     }
 
-    public function test_un_invitado_recibe_403(): void
+    public function test_un_invitado_va_al_login(): void
     {
-        $this->get(route('perfil.edit'))->assertForbidden();
-        $this->patch(route('perfil.update'), $this->datosValidos())->assertForbidden();
+        $url = $this->urlPublica(Negocio::factory()->create()).'panel/perfil';
+
+        $this->get($url)->assertRedirect('http://auth.'.config('tucarta.dominio'));
+        $this->patch($url, $this->datosValidos())->assertRedirect('http://auth.'.config('tucarta.dominio'));
+    }
+
+    public function test_el_logo_se_pide_a_la_misma_direccion_de_la_pagina(): void
+    {
+        $negocio = Negocio::factory()->create(['logo_path' => 'logos/mi-logo.png']);
+
+        $this->get($this->urlPublica($negocio))->assertSee('src="/storage/logos/mi-logo.png"', false);
     }
 }

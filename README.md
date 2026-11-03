@@ -136,6 +136,11 @@ El dominio base sale de `TUCARTA_DOMINIO` (`tucarta.localhost` en los escritorio
 | `{subdominio}.tucarta.localhost/panel` | Dueño y empleados de ese negocio | Panel del negocio: sus categorías |
 | `{subdominio}.tucarta.localhost/panel/categorias/{id}` | Dueño y empleados de ese negocio | Productos de una categoría |
 | `{subdominio}.tucarta.localhost/panel/equipo` | Dueño con `gestionar_equipo` | Equipo de trabajo: alta y desactivación de empleados (US-23) |
+| `{subdominio}.tucarta.localhost/panel/perfil` | Quien tenga `editar_perfil` | Perfil del negocio: datos y logo (US-05) |
+| `{subdominio}.tucarta.localhost/panel/categorias` | Quien tenga `editar_perfil` | Categorías del menú (US-06) |
+| `{subdominio}.tucarta.localhost/panel/horarios` | Quien tenga `editar_perfil` | Horarios de atención, incluso cruzando la medianoche (US-19a) |
+| `{subdominio}.tucarta.localhost/panel/cierre-temporal` | Quien tenga `editar_perfil` | Cierre temporal del negocio (US-19b) |
+| `{subdominio}.tucarta.localhost/prueba/enviar-pedido` | Público | Ruta de prueba del bloqueo de pedidos hasta que exista el envío real (US-19b) |
 | `{subdominio}.tucarta.localhost/panel/prueba/...` | Según el permiso | Rutas de prueba de cada permiso hasta que existan sus pantallas (US-23) |
 | `/up` | Todos | Revisión de estado de Laravel |
 
@@ -167,6 +172,7 @@ Hasta ahora el proyecto tiene:
 - **Panel central**: alta de negocios con la cuenta de su dueño (US-02a) y lista y estado de negocios con búsqueda, filtro, paginación, suspender y reactivar (US-03).
 - **Dirección de cada negocio según su estado** (US-02b) y **auto-registro público** que deja el negocio pendiente (US-26a).
 - **Kit de diseño** del panel (US-34), ver [docs/kit-diseno.md](docs/kit-diseno.md).
+- **Panel del negocio**: perfil y logo (US-05), categorías (US-06), horarios (US-19a) y cierre temporal con bloqueo de pedidos en el servidor (US-19b).
 
 Las cuentas usan un tipo base en `usuarios.rol`: `administrador`, `negocio` o `cliente`. El moderador y el empleado no son tipos aparte: son un administrador o un negocio con menos permisos en `usuario_permisos`.
 
