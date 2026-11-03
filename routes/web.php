@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\EquipoController;
+use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\NegocioPublicoController;
@@ -21,6 +22,7 @@ Route::middleware('permiso:gestionar_equipo')->group(function () {
         ->name('equipo.desactivar');
 });
 
+// US-06: Categorías del menú
 Route::middleware('permiso:editar_perfil')->prefix('categorias')->name('categorias.')->group(function () {
     Route::get('/', [CategoriaController::class, 'index'])->name('index');
     Route::post('/', [CategoriaController::class, 'store'])->name('store');
@@ -28,6 +30,13 @@ Route::middleware('permiso:editar_perfil')->prefix('categorias')->name('categori
     Route::delete('{categoria}', [CategoriaController::class, 'destroy'])->name('destroy');
     Route::patch('{categoria}/subir', [CategoriaController::class, 'subir'])->name('subir');
     Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
+});
+
+// US-19a: horarios de atencion del negocio (dueño).
+Route::middleware('permiso:editar_perfil')->prefix('horarios')->name('horarios.')->group(function () {
+    Route::get('/', [HorarioController::class, 'index'])->name('index');
+    Route::post('/', [HorarioController::class, 'store'])->name('store');
+    Route::delete('{horario}', [HorarioController::class, 'destroy'])->name('destroy');
 });
 
 Route::get('/prueba/avanzar-pedidos', fn () => 'Permiso avanzar_pedidos: OK')
@@ -61,8 +70,16 @@ Route::get('/login-local', function () {
     return redirect('/equipo');
 });
 
+// US-26a: auto-registro publico de negocios (sin sesion).
 Route::get('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
 Route::post('/registrar-negocio', [\App\Http\Controllers\AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
+
+// TEMPORAL: entrar sin login para tomar capturas. BORRAR ANTES DEL COMMIT.
+Route::get('/entrar-prueba/{email}', function (string $email) {
+    \Illuminate\Support\Facades\Auth::login(\App\Models\Usuario::where('email', $email)->firstOrFail());
+
+    return redirect('/horarios');
+});
 
 Route::middleware('permiso:editar_perfil')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
