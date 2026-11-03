@@ -3,6 +3,7 @@
 use App\Http\Controllers\AltaNegocioController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AutoRegistroNegocioController;
+use App\Http\Controllers\BandejaPendientesController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CierreTemporalController;
 use App\Http\Controllers\EquipoController;
@@ -41,6 +42,12 @@ Route::domain('auth.'.$dominio)->group(function () {
             Route::get('/', [NegocioController::class, 'index'])->name('index');
             Route::get('/crear', [AltaNegocioController::class, 'create'])->name('create');
             Route::post('/', [AltaNegocioController::class, 'store'])->name('store');
+
+            // US-26b: bandeja de pendientes
+            Route::get('/pendientes', [BandejaPendientesController::class, 'index'])->name('pendientes');
+            Route::patch('{negocio}/aprobar', [BandejaPendientesController::class, 'aprobar'])->name('aprobar');
+            Route::patch('{negocio}/rechazar', [BandejaPendientesController::class, 'rechazar'])->name('rechazar');
+
             Route::patch('{negocio}/suspender', [NegocioController::class, 'suspender'])->name('suspender');
             Route::patch('{negocio}/reactivar', [NegocioController::class, 'reactivar'])->name('reactivar');
         });

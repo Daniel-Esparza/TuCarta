@@ -8,6 +8,7 @@
 
         @can('create', App\Models\Negocio::class)
             <x-button :href="route('negocios.create')">Dar de alta un negocio</x-button>
+            <x-button variant="outline" :href="route('negocios.pendientes')">Negocios pendientes</x-button>
         @endcan
 
         @if (session('estado'))
@@ -46,7 +47,7 @@
                                              etiqueta="Reactivar" titulo="Reactivar este negocio"
                                              mensaje="Su menu volvera a estar disponible para clientes."
                                              confirmar="Reactivar" />
-                            @else
+                            @elseif ($negocio->estado === App\Enums\EstadoNegocio::Activo)
                                 <x-confirmar :accion="route('negocios.suspender', $negocio)" metodo="PATCH"
                                              etiqueta="Suspender" titulo="Suspender este negocio"
                                              mensaje="Su menu mostrara un aviso. No se borra su informacion."

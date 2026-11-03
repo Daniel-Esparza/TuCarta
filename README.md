@@ -131,6 +131,7 @@ El dominio base sale de `TUCARTA_DOMINIO` (`tucarta.localhost` en los escritorio
 | `auth.tucarta.localhost/panel` | Administrador y moderadores | Panel central |
 | `auth.tucarta.localhost/panel/negocios` | Administrador y moderadores con `gestionar_negocios` | Lista, búsqueda, filtro, suspender y reactivar negocios (US-03) |
 | `auth.tucarta.localhost/panel/negocios/crear` | Administrador con `gestionar_negocios` global | Alta de un negocio con la cuenta de su dueño (US-02a) |
+| `auth.tucarta.localhost/panel/negocios/pendientes` | Administrador con `gestionar_negocios` global | Bandeja del auto-registro: aprobar o rechazar con motivo (US-26b) |
 | `auth.tucarta.localhost/panel/moderadores` | Administrador con `gestionar_moderadores` | Moderadores y sus permisos (US-27) |
 | `{subdominio}.tucarta.localhost/` | Público | Página provisional del negocio (US-02b). El menú llega con US-11 |
 | `{subdominio}.tucarta.localhost/panel` | Dueño y empleados de ese negocio | Panel del negocio: sus categorías |
@@ -147,7 +148,7 @@ El dominio base sale de `TUCARTA_DOMINIO` (`tucarta.localhost` en los escritorio
 Reglas:
 
 - Los subdominios `auth`, `www`, `admin`, `api`, `app`, `mail` y `traefik` están reservados y nunca son un negocio (`config/tucarta.php`).
-- La dirección web de un negocio usa solo minúsculas, números y guion, de 3 a 30 caracteres, sin repetirse. La regla vive en `App\Rules\DireccionWeb` y la usan el alta del administrador y el auto-registro.
+- La dirección web de un negocio usa solo minúsculas, números y guion, de 3 a 30 caracteres, sin repetirse. La regla vive en `App\Rules\DireccionWeb` y la usan el alta del administrador y el auto-registro. La dirección de un negocio rechazado queda libre.
 - Un negocio activo abre su página. Uno suspendido muestra un aviso, sin borrar su información. Uno pendiente, rechazado o que no existe responde la misma página 404, para no revelar cuál es cuál (US-02b).
 - Sin sesión, los paneles mandan al login unificado.
 - Quien no pertenece a un negocio, o intenta abrir algo de otro negocio cambiando la dirección, recibe **404, nunca 403**: no se confirma que exista. Quien sí pertenece pero no tiene el permiso recibe 403.
@@ -169,7 +170,7 @@ Hasta ahora el proyecto tiene:
 - **Separación por negocio** (US-04): cada subdominio resuelve su negocio, los modelos con `negocio_id` filtran solos y PostgreSQL aplica Row Level Security en las 9 tablas con `negocio_id`.
 - **Catálogo de permisos** (US-04), con moderadores (US-27) y empleados (US-23), ver abajo.
 - **Login unificado** en `auth.tucarta.localhost`: cada cuenta llega a su panel, bloqueo de 5 minutos tras 5 intentos fallidos y cierre de sesión. La sesión vale en todos los subdominios (decisión D4).
-- **Panel central**: alta de negocios con la cuenta de su dueño (US-02a) y lista y estado de negocios con búsqueda, filtro, paginación, suspender y reactivar (US-03).
+- **Panel central**: bandeja de negocios pendientes (US-26b), alta de negocios con la cuenta de su dueño (US-02a) y lista y estado de negocios con búsqueda, filtro, paginación, suspender y reactivar (US-03).
 - **Dirección de cada negocio según su estado** (US-02b) y **auto-registro público** que deja el negocio pendiente (US-26a).
 - **Kit de diseño** del panel (US-34), ver [docs/kit-diseno.md](docs/kit-diseno.md).
 - **Panel del negocio**: perfil y logo (US-05), categorías (US-06), horarios (US-19a) y cierre temporal con bloqueo de pedidos en el servidor (US-19b).
