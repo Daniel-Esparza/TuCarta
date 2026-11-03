@@ -22,9 +22,12 @@ class NegocioController extends Controller
         $negocios = Negocio::query()
             ->when(! $usuario->tienePermisoGlobal('gestionar_negocios'), fn ($q) => $q
                 ->whereIn('id', $usuario->negociosConPermiso('gestionar_negocios')))
-            ->when($request->filled('q'), fn ($q) => $q->where(fn ($w) => $w
-                ->where('nombre', 'ilike', '%'.$request->string('q').'%')
-                ->orWhere('subdominio', 'ilike', '%'.$request->string('q').'%')))
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = '%'.mb_strtolower($request->string('q')).'%';
+                return $q->where(fn ($w) => $w
+                    ->whereRaw('lower(nombre) like ?', [$term])
+                    ->orWhereRaw('lower(subdominio) like ?', [$term]));
+            })
             ->when(in_array($request->estado, ['activo', 'pendiente', 'suspendido', 'rechazado'], true),
                 fn ($q) => $q->where('estado', $request->estado))
             ->withCount('items')
