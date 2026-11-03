@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClavePermiso;
 use App\Models\Negocio;
 use App\Models\Permiso;
 use App\Models\Usuario;
 use App\Models\UsuarioPermiso;
+use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,18 +15,16 @@ class ModeradoresPermisosTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function darPermiso(Usuario $usuario, string $clave, ?Negocio $negocio = null): UsuarioPermiso
+    protected function setUp(): void
     {
-        $permiso = Permiso::firstOrCreate(
-            ['clave' => $clave],
-            ['descripcion' => $clave, 'tipo_usuario' => 'administrador']
-        );
+        parent::setUp();
 
-        return UsuarioPermiso::create([
-            'usuario_id' => $usuario->id,
-            'permiso_id' => $permiso->id,
-            'negocio_id' => $negocio?->id,
-        ]);
+        $this->seed(PermisosSeeder::class);
+    }
+
+    private function darPermiso(Usuario $usuario, ClavePermiso $clave, ?Negocio $negocio = null): UsuarioPermiso
+    {
+        return $usuario->otorgarPermiso($clave, $negocio);
     }
 
     public function test_moderador_sin_permisos_no_ve_ningun_negocio(): void
@@ -42,7 +42,7 @@ class ModeradoresPermisosTest extends TestCase
         $tacos = Negocio::factory()->create();
         $sushi = Negocio::factory()->create();
 
-        $asignacion = $this->darPermiso($moderador, 'gestionar_negocios', $tacos);
+        $asignacion = $this->darPermiso($moderador, ClavePermiso::GestionarNegocios, $tacos);
 
         $this->assertTrue($moderador->can('view', $tacos));
         $this->assertFalse($moderador->can('view', $sushi));
@@ -56,7 +56,7 @@ class ModeradoresPermisosTest extends TestCase
     public function test_moderador_no_puede_tocar_cuentas_de_administrador(): void
     {
         $moderador = Usuario::factory()->administrador()->create();
-        $this->darPermiso($moderador, 'gestionar_negocios'); // global, pero sin gestionar_moderadores
+        $this->darPermiso($moderador, ClavePermiso::GestionarNegocios); // global, pero sin gestionar_moderadores
         $otroAdmin = Usuario::factory()->administrador()->create();
 
         $this->assertFalse($moderador->can('create', Usuario::class));
@@ -64,16 +64,16 @@ class ModeradoresPermisosTest extends TestCase
         $this->assertFalse($moderador->can('delete', $otroAdmin));
 
         $principal = Usuario::factory()->administrador()->create();
-        $this->darPermiso($principal, 'gestionar_moderadores');
+        $this->darPermiso($principal, ClavePermiso::GestionarModeradores);
 
         $this->assertTrue($principal->can('create', Usuario::class));
         $this->assertTrue($principal->can('update', $moderador));
     }
 
-        public function test_administrador_principal_crea_moderador_sin_permisos(): void
+    public function test_administrador_principal_crea_moderador_sin_permisos(): void
     {
         $principal = Usuario::factory()->administrador()->create();
-        $this->darPermiso($principal, 'gestionar_moderadores');
+        $this->darPermiso($principal, ClavePermiso::GestionarModeradores);
 
         $this->actingAs($principal)->post(route('moderadores.store'), [
             'nombre' => 'Mod',
@@ -100,5 +100,20 @@ class ModeradoresPermisosTest extends TestCase
             'telefono_whatsapp' => '4440000000',
             'password' => 'password123',
         ])->assertForbidden();
+    }
+
+    public function test_a_un_moderador_no_se_le_puede_asignar_un_permiso_de_negocio(): void
+    {
+        $principal = Usuario::factory()->administrador()->create();
+        $this->darPermiso($principal, ClavePermiso::GestionarModeradores);
+        $moderador = Usuario::factory()->administrador()->create();
+
+        $this->actingAs($principal)
+            ->post(route('moderadores.permisos.store', $moderador), [
+                'permiso_id' => Permiso::deClave(ClavePermiso::VerMetricas)->id,
+            ])
+            ->assertSessionHasErrors('permiso_id');
+
+        $this->assertSame(0, $moderador->permisos()->count());
     }
 }

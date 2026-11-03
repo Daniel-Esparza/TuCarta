@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Negocio;
+use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -66,9 +67,16 @@ class NegocioDireccionTest extends TestCase
         $this->get($this->url('sushi-ana'))->assertSee('Sushi Ana')->assertDontSee('Tacos Juan');
     }
 
-        public function test_el_panel_central_no_cae_en_la_pagina_de_error(): void
+    public function test_el_panel_central_no_cae_en_la_pagina_de_error(): void
     {
-        $respuesta = $this->get($this->url('auth'));
+        // Sin sesión, auth.{dominio} es el login unificado.
+        $this->get($this->url('auth'))
+            ->assertOk()
+            ->assertSee('Iniciar Sesión')
+            ->assertDontSee('Página no disponible');
+
+        // Con sesión de administrador, manda a su panel.
+        $respuesta = $this->actingAs(Usuario::factory()->administrador()->create())->get($this->url('auth'));
 
         $respuesta->assertStatus(302);
         $this->assertStringEndsWith('/panel', $respuesta->headers->get('Location'));

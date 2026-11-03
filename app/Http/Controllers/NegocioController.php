@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClavePermiso;
+use App\Enums\EstadoNegocio;
 use App\Models\Negocio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,7 +45,7 @@ class NegocioController extends Controller
     {
         Gate::authorize('update', $negocio);
 
-        $negocio->update(['estado' => 'suspendido']);
+        $negocio->update(['estado' => EstadoNegocio::Suspendido]);
 
         return redirect()->route('negocios.index')
             ->with('estado', "{$negocio->nombre} suspendido.");
@@ -53,7 +55,7 @@ class NegocioController extends Controller
     {
         Gate::authorize('update', $negocio);
 
-        $negocio->update(['estado' => 'activo']);
+        $negocio->update(['estado' => EstadoNegocio::Activo]);
 
         return redirect()->route('negocios.index')
             ->with('estado', "{$negocio->nombre} reactivado.");

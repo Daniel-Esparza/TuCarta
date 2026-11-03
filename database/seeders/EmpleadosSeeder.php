@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ClavePermiso;
 use App\Models\Negocio;
-use App\Models\Permiso;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 
@@ -11,15 +11,7 @@ class EmpleadosSeeder extends Seeder
 {
     public function run(): void
     {
-        $avanzarPedidos = Permiso::firstOrCreate(
-            ['clave' => 'avanzar_pedidos'],
-            ['descripcion' => 'Avanzar el estado de los pedidos', 'tipo_usuario' => 'negocio'],
-        );
-
-        $marcarAgotado = Permiso::firstOrCreate(
-            ['clave' => 'marcar_agotado'],
-            ['descripcion' => 'Marcar productos como agotados', 'tipo_usuario' => 'negocio'],
-        );
+        $this->call(PermisosSeeder::class);
 
         $tacos = Negocio::where('subdominio', 'tacos-juan')->first();
 
@@ -33,9 +25,7 @@ class EmpleadosSeeder extends Seeder
             'email' => 'marco@tacos-juan.tucarta.local',
         ]);
 
-        $empleado->permisos()->createMany([
-            ['permiso_id' => $avanzarPedidos->id, 'negocio_id' => $tacos->id],
-            ['permiso_id' => $marcarAgotado->id, 'negocio_id' => $tacos->id],
-        ]);
+        $empleado->otorgarPermiso(ClavePermiso::AvanzarPedidos, $tacos);
+        $empleado->otorgarPermiso(ClavePermiso::MarcarAgotado, $tacos);
     }
 }
