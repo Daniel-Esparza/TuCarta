@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $categoria->nombre }} - {{ $negocio->nombre }}</title>
-</head>
-<body>
-    <p><a href="{{ route('panel.negocio') }}">Volver al panel</a></p>
+<x-layouts.app :title="$categoria->nombre.' - '.$negocio->nombre">
+    <div class="flex flex-col gap-6">
+        <header class="flex flex-col gap-1">
+            <p class="text-xs font-bold uppercase tracking-widest text-brand-terracotta">Panel del negocio</p>
+            <h1 class="text-xl font-extrabold">{{ $categoria->nombre }}</h1>
+        </header>
 
-    <h1>{{ $categoria->nombre }}</h1>
+        <section class="flex flex-col gap-3">
+            @forelse ($categoria->items as $item)
+                <article class="flex items-center justify-between gap-3 rounded-2xl border border-brand-beigeBorder bg-brand-beigeInput px-4 py-3 text-sm">
+                    <span class="font-bold">{{ $item->nombre }}{{ $item->disponible_hoy ? '' : ' (agotado)' }}</span>
+                    <span>${{ number_format($item->precio, 2) }}</span>
+                </article>
+            @empty
+                <p class="rounded-2xl border border-dashed border-brand-beigeBorder px-4 py-6 text-center text-sm text-brand-dark/60">
+                    Esta categoría no tiene productos.
+                </p>
+            @endforelse
+        </section>
 
-    @if ($categoria->items->isEmpty())
-        <p>Esta categoría no tiene productos.</p>
-    @else
-        <ul>
-            @foreach ($categoria->items as $item)
-                <li>{{ $item->nombre }} - ${{ number_format($item->precio, 2) }}{{ $item->disponible_hoy ? '' : ' (agotado)' }}</li>
-            @endforeach
-        </ul>
-    @endif
-</body>
-</html>
+        <x-button variant="outline" :href="route('panel.negocio')">Volver al panel</x-button>
+    </div>
+</x-layouts.app>

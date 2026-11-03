@@ -129,7 +129,7 @@ class AislamientoPorNegocioTest extends TestCase
         $this->actingAs($this->juan)->get($this->url('auth', '/panel'))->assertNotFound();
     }
 
-    public function test_el_administrador_ve_todos_los_negocios_y_no_entra_al_panel_de_un_negocio(): void
+    public function test_el_panel_central_no_lista_negocios_y_el_administrador_no_entra_al_panel_de_un_negocio(): void
     {
         $admin = Usuario::where('email', 'admin@tucarta.local')->firstOrFail();
 
@@ -137,8 +137,8 @@ class AislamientoPorNegocioTest extends TestCase
             ->get($this->url('auth', '/panel'))
             ->assertOk()
             ->assertSee('Hola Administrador')
-            ->assertSee('tacos-juan')
-            ->assertSee('sushi-ana');
+            ->assertDontSee('tacos-juan')
+            ->assertDontSee('sushi-ana');
 
         $this->actingAs($admin)->get($this->url('tacos-juan', '/panel'))->assertNotFound();
     }

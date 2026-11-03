@@ -1,5 +1,10 @@
-<x-layouts.app>
-    <h1>Perfil del negocio</h1>
+<x-layouts.app title="Perfil del negocio">
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <header class="flex flex-col gap-1">
+            <p class="text-xs font-bold uppercase tracking-widest text-brand-terracotta">Panel del negocio</p>
+            <h1 class="text-xl font-extrabold">Perfil del negocio</h1>
+            <p class="text-sm text-brand-dark/70">Estos datos se muestran en la página pública de tu negocio.</p>
+        </header>
 
     @if (session('estado'))
         <x-alerta>{{ session('estado') }}</x-alerta>
@@ -36,4 +41,7 @@
 
         <x-button type="submit">Guardar cambios</x-button>
     </form>
+
+    <x-button variant="outline" :href="route('panel.negocio')">Volver al panel</x-button>
+    </div>
 </x-layouts.app>
