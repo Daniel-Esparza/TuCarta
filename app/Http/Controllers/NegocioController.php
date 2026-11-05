@@ -44,6 +44,7 @@ class NegocioController extends Controller
     public function suspender(Request $request, Negocio $negocio): RedirectResponse
     {
         Gate::authorize('update', $negocio);
+        abort_unless($negocio->estado === EstadoNegocio::Activo, 404);
 
         $negocio->update(['estado' => EstadoNegocio::Suspendido]);
 
@@ -54,6 +55,7 @@ class NegocioController extends Controller
     public function reactivar(Request $request, Negocio $negocio): RedirectResponse
     {
         Gate::authorize('update', $negocio);
+        abort_unless($negocio->estado === EstadoNegocio::Suspendido, 404);
 
         $negocio->update(['estado' => EstadoNegocio::Activo]);
 

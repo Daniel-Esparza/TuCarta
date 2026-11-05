@@ -28,7 +28,9 @@ class ResolverNegocio
             abort(404);
         }
 
-        $negocio = Negocio::where('subdominio', $subdominio)->first();
+        $negocio = Negocio::where('subdominio', $subdominio)
+            ->where('estado', '<>', EstadoNegocio::Rechazado)
+            ->first();
 
         if ($negocio?->estado === EstadoNegocio::Suspendido) {
             return response()->view('negocio.suspendido', ['negocio' => $negocio]);

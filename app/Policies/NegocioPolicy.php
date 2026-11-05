@@ -36,6 +36,12 @@ class NegocioPolicy
             && $usuario->tienePermisoGlobal(ClavePermiso::GestionarNegocios);
     }
 
+    // US-26b: aprobar o rechazar auto-registros pide el permiso global.
+    public function revisarPendientes(Usuario $usuario): bool
+    {
+        return $this->create($usuario);
+    }
+
     public function update(Usuario $usuario, Negocio $negocio): bool
     {
         return $this->view($usuario, $negocio);

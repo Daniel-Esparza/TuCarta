@@ -24,6 +24,8 @@ Subdominios reservados, que nunca son negocio: `auth`, `www`, `admin`, `api`, `a
 - Los estados viven en `App\Enums\EstadoNegocio`: `Activo`, `Suspendido`, `Pendiente` y `Rechazado`. El modelo `Negocio` lo regresa como enum: `$negocio->estado === EstadoNegocio::Activo`. El motivo de un rechazo va en `motivo_rechazo`.
 - La dirección web se valida siempre con `new App\Rules\DireccionWeb` (formato, 3 a 30 caracteres, reservadas y repetida). Para editar un negocio: `new DireccionWeb($negocio)`, así su propia dirección no cuenta como repetida.
 - El WhatsApp se valida con `new App\Rules\Whatsapp`, después de `Whatsapp::normalizar()`.
+- Al aprobar un pendiente (US-26b) se crea la cuenta del dueño con el correo de contacto y una contraseña temporal que se muestra una vez al administrador.
+- Al rechazar se guarda el motivo y la dirección queda libre: el índice único de `subdominio` no cuenta a los rechazados. Quien busque un negocio por subdominio debe excluirlos.
 - Nadie crea migraciones de `negocios` por su cuenta: los cambios de base de datos se piden a quien lleva el Bloque 1.
 
 ## Middleware

@@ -16,6 +16,10 @@
 
     <p><a href="{{ route('negocios.index') }}">Lista y estado de negocios</a></p>
 
+    @can('revisarPendientes', App\Models\Negocio::class)
+        <p><a href="{{ route('negocios.pendientes') }}">Negocios pendientes</a></p>
+    @endcan
+
     @can('create', App\Models\Usuario::class)
         <p><a href="{{ route('moderadores.index') }}">Moderadores y permisos</a></p>
     @endcan

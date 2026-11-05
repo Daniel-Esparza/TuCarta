@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Enums\EstadoNegocio;
 use App\Models\Negocio;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -52,8 +53,9 @@ class DireccionWeb implements ValidationRule
         }
 
         // La tabla negocios no tiene RLS: la búsqueda ve todos los negocios
-        // aunque no haya uno fijado en la petición.
+        // aunque no haya uno fijado en la petición. Un rechazado ya no aparta su dirección.
         $repetida = Negocio::where('subdominio', $value)
+            ->where('estado', '<>', EstadoNegocio::Rechazado)
             ->when($this->ignorar, fn ($consulta) => $consulta->whereKeyNot($this->ignorar->getKey()))
             ->exists();
 
