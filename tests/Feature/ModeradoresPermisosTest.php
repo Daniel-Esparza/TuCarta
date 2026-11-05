@@ -27,6 +27,19 @@ class ModeradoresPermisosTest extends TestCase
         return $usuario->otorgarPermiso($clave, $negocio);
     }
 
+    public function test_moderador_sin_permisos_no_ve_negocios_en_el_panel_central(): void
+    {
+        $moderador = Usuario::factory()->administrador()->create();
+        $negocio = Negocio::factory()->create(['nombre' => 'Negocio Ajeno']);
+
+        $this->actingAs($moderador)
+            ->get('http://auth.'.config('tucarta.dominio').'/panel')
+            ->assertOk()
+            ->assertDontSee($negocio->nombre)
+            ->assertDontSee('Negocios pendientes')
+            ->assertDontSee('Alta de negocio');
+    }
+
     public function test_moderador_sin_permisos_no_ve_ningun_negocio(): void
     {
         $moderador = Usuario::factory()->administrador()->create();

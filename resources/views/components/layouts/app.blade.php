@@ -10,7 +10,17 @@
     <header class="bg-brand-beigeCard border-b border-brand-beigeBorder px-4 py-3 shadow-sm">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold text-brand-terracotta">TuCarta</h1>
-            {{ $header ?? '' }}
+            <div class="flex flex-wrap items-center justify-end gap-3">
+                {{ $header ?? '' }}
+                @auth
+                    <a href="{{ App\Http\Controllers\Auth\LoginController::inicioDe(auth()->user()) }}"
+                       class="inline-flex min-h-[44px] items-center text-sm font-medium hover:underline">Mi panel</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-button variant="outline" type="submit">Cerrar sesión</x-button>
+                    </form>
+                @endauth
+            </div>
         </div>
     </header>
 

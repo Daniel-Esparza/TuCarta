@@ -1,8 +1,14 @@
 <x-layouts.app title="Negocios pendientes">
-    <h1>Negocios pendientes</h1>
-    <p>Solicitudes del auto-registro. Al aprobar, el negocio abre en su dirección y se crea la cuenta de su dueño.</p>
+    <div class="flex flex-col gap-6">
+        <header class="flex flex-col gap-1">
+            <p class="text-xs font-bold uppercase tracking-widest text-brand-terracotta">Panel central</p>
+            <h1 class="text-xl font-extrabold">Negocios pendientes</h1>
+            <p class="text-sm text-brand-dark/70">Solicitudes del auto-registro. Al aprobar, el negocio abre en su dirección y se crea la cuenta de su dueño.</p>
+        </header>
 
-    <x-button variant="outline" :href="route('negocios.index')">Ver todos los negocios</x-button>
+    <div>
+        <x-button variant="outline" :href="route('negocios.index')">Ver todos los negocios</x-button>
+    </div>
 
     @if (session('aprobado'))
         <x-alerta>
@@ -26,7 +32,9 @@
     @enderror
 
     @if ($negocios->isEmpty())
-        <p>No hay negocios pendientes.</p>
+        <p class="rounded-2xl border border-dashed border-brand-beigeBorder px-4 py-6 text-center text-sm text-brand-dark/60">
+            No hay negocios pendientes.
+        </p>
     @else
         <x-tabla :encabezados="['Nombre', 'Dirección web', 'WhatsApp', 'Correo', 'Solicitud', 'Estado', 'Acciones']">
             @foreach ($negocios as $negocio)
@@ -38,6 +46,7 @@
                     <x-tabla.celda etiqueta="Solicitud">{{ $negocio->created_at->format('d/m/Y') }}</x-tabla.celda>
                     <x-tabla.celda etiqueta="Estado"><x-estado-negocio :estado="$negocio->estado" /></x-tabla.celda>
                     <x-tabla.celda etiqueta="Acciones">
+                        <div class="flex flex-wrap gap-2">
                         <x-confirmar :accion="route('negocios.aprobar', $negocio)" metodo="PATCH"
                                      etiqueta="Aprobar" :titulo="'Aprobar '.$negocio->nombre"
                                      mensaje="El negocio queda activo y se crea la cuenta de su dueño con una contraseña temporal."
@@ -49,6 +58,7 @@
                                      confirmar="Rechazar">
                             <x-campo nombre="motivo" :id="'motivo-'.$negocio->id" etiqueta="Motivo del rechazo" />
                         </x-confirmar>
+                        </div>
                     </x-tabla.celda>
                 </x-tabla.fila>
             @endforeach
@@ -56,4 +66,5 @@
 
         {{ $negocios->links() }}
     @endif
+    </div>
 </x-layouts.app>

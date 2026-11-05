@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
-use App\Models\Negocio;
 use App\Support\NegocioActual;
 use Illuminate\View\View;
 
@@ -11,9 +10,7 @@ class PanelController extends Controller
 {
     public function administrador(): View
     {
-        return view('panel.administrador', [
-            'negocios' => Negocio::orderBy('nombre')->get(),
-        ]);
+        return view('panel.administrador');
     }
 
     public function negocio(NegocioActual $negocioActual): View

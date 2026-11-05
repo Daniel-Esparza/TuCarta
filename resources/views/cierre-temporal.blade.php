@@ -50,6 +50,7 @@
                 @endif
 
                 <x-button variant="outline" :href="route('horarios.index')">Ver mis horarios</x-button>
+                <x-button variant="outline" :href="route('panel.negocio')">Volver al panel</x-button>
             </div>
         </section>
 
