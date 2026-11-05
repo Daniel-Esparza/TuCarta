@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PerteneceANegocio;
 use Illuminate\Database\Eloquent\Model;
 
 class Horario extends Model
 {
+    use PerteneceANegocio;
+
     /** Fin de día: un rango que cruza la medianoche se parte aquí. */
     public const FIN_DE_DIA = '23:59:59';
 

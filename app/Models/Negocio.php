@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoNegocio;
 use Carbon\CarbonInterface;
 use Database\Factories\NegocioFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'cerrado_temporal',
     'personalizacion',
     'estado',
+    'motivo_rechazo',
 ])]
 class Negocio extends Model
 {
@@ -33,6 +35,7 @@ class Negocio extends Model
     protected function casts(): array
     {
         return [
+            'estado' => EstadoNegocio::class,
             'cerrado_temporal' => 'boolean',
             'personalizacion' => 'array',
         ];

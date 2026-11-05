@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClavePermiso;
+use App\Enums\EstadoNegocio;
 use App\Models\Negocio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,16 +22,16 @@ class NegocioController extends Controller
         abort_unless($usuario->esAdministrador(), 403);
 
         $negocios = Negocio::query()
-            ->when(! $usuario->tienePermisoGlobal('gestionar_negocios'), fn ($q) => $q
-                ->whereIn('id', $usuario->negociosConPermiso('gestionar_negocios')))
+            ->when(! $usuario->tienePermisoGlobal(ClavePermiso::GestionarNegocios), fn ($q) => $q
+                ->whereIn('id', $usuario->negociosConPermiso(ClavePermiso::GestionarNegocios)))
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = '%'.mb_strtolower($request->string('q')).'%';
                 return $q->where(fn ($w) => $w
                     ->whereRaw('lower(nombre) like ?', [$term])
                     ->orWhereRaw('lower(subdominio) like ?', [$term]));
             })
-            ->when(in_array($request->estado, ['activo', 'pendiente', 'suspendido', 'rechazado'], true),
-                fn ($q) => $q->where('estado', $request->estado))
+            ->when(EstadoNegocio::tryFrom((string) $request->estado),
+                fn ($q, $estado) => $q->where('estado', $estado))
             ->withCount('items')
             ->orderBy('nombre')
             ->paginate(20)
@@ -43,7 +45,7 @@ class NegocioController extends Controller
     {
         Gate::authorize('update', $negocio);
 
-        $negocio->update(['estado' => 'suspendido']);
+        $negocio->update(['estado' => EstadoNegocio::Suspendido]);
 
         return redirect()->route('negocios.index')
             ->with('estado', "{$negocio->nombre} suspendido.");
@@ -53,7 +55,7 @@ class NegocioController extends Controller
     {
         Gate::authorize('update', $negocio);
 
-        $negocio->update(['estado' => 'activo']);
+        $negocio->update(['estado' => EstadoNegocio::Activo]);
 
         return redirect()->route('negocios.index')
             ->with('estado', "{$negocio->nombre} reactivado.");

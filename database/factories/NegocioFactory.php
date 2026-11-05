@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\EstadoNegocio;
 use App\Models\Negocio;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -26,12 +27,22 @@ class NegocioFactory extends Factory
             'descripcion' => fake()->sentence(),
             'direccion' => fake()->address(),
             'categoria' => fake()->randomElement(['Antojitos', 'Mariscos', 'Cafetería', 'Tacos']),
-            'estado' => 'activo',
+            'estado' => EstadoNegocio::Activo,
         ];
     }
 
     public function pendiente(): static
     {
-        return $this->state(fn () => ['estado' => 'pendiente']);
+        return $this->state(fn () => ['estado' => EstadoNegocio::Pendiente]);
+    }
+
+    public function suspendido(): static
+    {
+        return $this->state(fn () => ['estado' => EstadoNegocio::Suspendido]);
+    }
+
+    public function rechazado(string $motivo = 'Datos incompletos'): static
+    {
+        return $this->state(fn () => ['estado' => EstadoNegocio::Rechazado, 'motivo_rechazo' => $motivo]);
     }
 }

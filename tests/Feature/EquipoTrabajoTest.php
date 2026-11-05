@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClavePermiso;
 use App\Enums\Rol;
 use App\Models\Negocio;
-use App\Models\Permiso;
 use App\Models\Usuario;
+use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
@@ -14,21 +15,27 @@ class EquipoTrabajoTest extends TestCase
 {
     use RefreshDatabase;
 
-    
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(PermisosSeeder::class);
+    }
+
     private function duenoConPermisoDeEquipo(): array
     {
         $negocio = Negocio::factory()->create();
 
         $dueno = Usuario::factory()->deNegocio($negocio)->create();
-        $dueno->permisos()->create([
-            'permiso_id' => Permiso::firstOrCreate(
-                ['clave' => 'gestionar_equipo'],
-                ['descripcion' => 'Gestionar el equipo de trabajo', 'tipo_usuario' => 'negocio'],
-            )->id,
-            'negocio_id' => $negocio->id,
-        ]);
+        $dueno->otorgarPermiso(ClavePermiso::GestionarEquipo, $negocio);
 
         return [$negocio, $dueno];
+    }
+
+    // La pantalla vive en el panel del subdominio del negocio.
+    private function equipo(Negocio $negocio, string $ruta = ''): string
+    {
+        return 'http://'.$negocio->subdominio.'.'.config('tucarta.dominio').'/panel/equipo'.$ruta;
     }
 
     private function datosDeEmpleado(array $extras = []): array
@@ -51,7 +58,7 @@ class EquipoTrabajoTest extends TestCase
             'apellidos' => 'El del Mostrador',
         ]);
 
-        $this->actingAs($dueno)->get('/equipo')
+        $this->actingAs($dueno)->get($this->equipo($negocio))
             ->assertOk()
             ->assertSee('Equipo de trabajo')
             ->assertSee('Marco')
@@ -68,22 +75,26 @@ class EquipoTrabajoTest extends TestCase
             'apellidos' => 'Ajeno',
         ]);
 
-        $this->actingAs($dueno)->get('/equipo')
+        $this->actingAs($dueno)->get($this->equipo($negocio))
             ->assertOk()
             ->assertDontSee('EspiaDelSushi');
+    }
+
+    public function test_el_dueno_no_abre_el_equipo_de_otro_negocio(): void
+    {
+        [$negocio, $dueno] = $this->duenoConPermisoDeEquipo();
+        $otro = Negocio::factory()->create();
+
+        $this->actingAs($dueno)->get($this->equipo($otro))->assertNotFound();
     }
 
     public function test_el_dueno_crea_un_empleado_que_puede_iniciar_sesion(): void
     {
         [$negocio, $dueno] = $this->duenoConPermisoDeEquipo();
 
-        
-        Permiso::firstOrCreate(['clave' => 'avanzar_pedidos'], ['descripcion' => 'Avanzar pedidos', 'tipo_usuario' => 'negocio']);
-        Permiso::firstOrCreate(['clave' => 'marcar_agotado'], ['descripcion' => 'Marcar agotados', 'tipo_usuario' => 'negocio']);
-
         $this->actingAs($dueno)
-            ->post('/equipo', $this->datosDeEmpleado())
-            ->assertRedirect(route('equipo.index'));
+            ->post($this->equipo($negocio), $this->datosDeEmpleado())
+            ->assertRedirect($this->equipo($negocio));
 
         $empleado = Usuario::where('email', 'maria@example.com')->first();
         $this->assertNotNull($empleado);
@@ -91,12 +102,10 @@ class EquipoTrabajoTest extends TestCase
         $this->assertEquals($negocio->id, $empleado->negocio_id);
         $this->assertEquals('activo', $empleado->estado);
 
-        
-        $this->assertTrue($empleado->tienePermiso('avanzar_pedidos'));
-        $this->assertTrue($empleado->tienePermiso('marcar_agotado'));
-        $this->assertFalse($empleado->tienePermiso('ver_metricas'));
+        $this->assertTrue($empleado->tienePermiso(ClavePermiso::AvanzarPedidos));
+        $this->assertTrue($empleado->tienePermiso(ClavePermiso::MarcarAgotado));
+        $this->assertFalse($empleado->tienePermiso(ClavePermiso::VerMetricas));
 
-        
         $this->assertTrue(Auth::attempt([
             'email' => 'maria@example.com',
             'password' => '12345678',
@@ -126,8 +135,8 @@ class EquipoTrabajoTest extends TestCase
         $empleado = Usuario::factory()->deNegocio($negocio)->create();
 
         $this->actingAs($dueno)
-            ->patch(route('equipo.desactivar', $empleado))
-            ->assertRedirect(route('equipo.index'));
+            ->patch($this->equipo($negocio, '/'.$empleado->id.'/desactivar'))
+            ->assertRedirect($this->equipo($negocio));
 
         $this->assertDatabaseHas('usuarios', [
             'id' => $empleado->id,
@@ -143,7 +152,7 @@ class EquipoTrabajoTest extends TestCase
         $empleadoAjeno = Usuario::factory()->deNegocio($otro)->create();
 
         $this->actingAs($dueno)
-            ->patch(route('equipo.desactivar', $empleadoAjeno))
+            ->patch($this->equipo($negocio, '/'.$empleadoAjeno->id.'/desactivar'))
             ->assertNotFound();
     }
 
@@ -152,7 +161,7 @@ class EquipoTrabajoTest extends TestCase
         [$negocio, $dueno] = $this->duenoConPermisoDeEquipo();
 
         $this->actingAs($dueno)
-            ->patch(route('equipo.desactivar', $dueno))
+            ->patch($this->equipo($negocio, '/'.$dueno->id.'/desactivar'))
             ->assertForbidden();
     }
 
@@ -162,8 +171,8 @@ class EquipoTrabajoTest extends TestCase
 
         $empleado = Usuario::factory()->deNegocio($negocio)->create();
 
-        $this->actingAs($empleado)->get('/equipo')->assertForbidden();
-        $this->actingAs($empleado)->post('/equipo', $this->datosDeEmpleado())->assertForbidden();
+        $this->actingAs($empleado)->get($this->equipo($negocio))->assertForbidden();
+        $this->actingAs($empleado)->post($this->equipo($negocio), $this->datosDeEmpleado())->assertForbidden();
     }
 
     public function test_el_formulario_exige_todos_los_campos(): void
@@ -171,7 +180,7 @@ class EquipoTrabajoTest extends TestCase
         [$negocio, $dueno] = $this->duenoConPermisoDeEquipo();
 
         $this->actingAs($dueno)
-            ->post('/equipo', [])
+            ->post($this->equipo($negocio), [])
             ->assertSessionHasErrors(['nombre', 'apellidos', 'email', 'telefono_whatsapp', 'password']);
     }
 
@@ -180,7 +189,7 @@ class EquipoTrabajoTest extends TestCase
         [$negocio, $dueno] = $this->duenoConPermisoDeEquipo();
 
         $this->actingAs($dueno)
-            ->post('/equipo', $this->datosDeEmpleado(['email' => $dueno->email]))
+            ->post($this->equipo($negocio), $this->datosDeEmpleado(['email' => $dueno->email]))
             ->assertSessionHasErrors('email');
     }
 }
