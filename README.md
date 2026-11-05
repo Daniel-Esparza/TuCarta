@@ -4,214 +4,134 @@ Plataforma de catálogos digitales para restaurantes y negocios pequeños: cada 
 
 Proyecto de la materia Arquitectura Avanzada de Aplicaciones Web (UTSLP).
 
-## Stack
+## Ejecutar el proyecto
 
-- Laravel 13 (Blade, Eloquent) con Laravel Sail (Docker)
-- PHP 8.5 (el que usa la imagen de Sail del proyecto)
-- PostgreSQL 16
-- Tailwind CSS, Alpine.js y Vite
-- Traefik y mkcert para HTTPS
-- Pruebas con Pest/PHPUnit y GitHub Actions
+Solo necesitas **Git** y **Docker Desktop abierto**. No hace falta instalar PHP, Composer, Node ni PostgreSQL. Estos comandos funcionan igual en PowerShell, CMD, macOS y Linux:
 
-## Requisitos
-
-- Git
-- Docker y Docker Compose
-- En Windows: WSL2 con Docker Desktop (ejecuta todos los comandos dentro de WSL)
-
-No hace falta instalar PHP, Composer ni PostgreSQL en tu computadora.
-
-## Revisión rápida solo con Docker
-
-Para revisar el proyecto basta con Git y Docker Desktop. Funciona igual desde PowerShell, CMD, macOS o Linux, sin WSL:
-
-```bash
+```
 git clone https://github.com/Daniel-Esparza/TuCarta.git
 cd TuCarta
 docker compose up -d
 ```
 
-La primera vez tarda bastante, alrededor de 45 minutos según la computadora y la conexión: construye la imagen, instala las dependencias de PHP y de JavaScript, compila los estilos, crea el `.env`, genera la llave de la aplicación y carga la base de datos con los datos de prueba. Las siguientes veces arranca en segundos. Para ver cuándo termina:
+**La primera vez tarda alrededor de una hora**, según la computadora y la conexión: construye la imagen, instala las dependencias, compila los estilos, crea la configuración y carga la base con datos de prueba. Las siguientes veces arranca en segundos. Para ver el avance:
 
-```bash
+```
 docker compose logs -f laravel.test
 ```
 
-Cuando aparezca `Server running on [http://0.0.0.0:80]`, abre http://localhost. Sal de los logs con `Ctrl+C`.
+Cuando aparezca `Server running on [http://0.0.0.0:80]`, sal con `Ctrl+C` y abre **http://tucarta.localhost** en Chrome, Edge o Firefox.
 
-Si el puerto 80 está ocupado, usa otro puerto:
+Usa esa dirección y no `localhost`: las sesiones se comparten entre los subdominios de `tucarta.localhost`. No hay que editar el archivo `hosts`, porque los navegadores ya resuelven `*.localhost` hacia tu computadora.
 
-| Terminal | Comando |
+### Si algo falla
+
+| Qué pasa | Qué hacer |
 |---|---|
-| PowerShell | `$env:APP_PORT=8080; docker compose up -d` |
-| CMD | `set APP_PORT=8080` y luego `docker compose up -d` |
-| macOS / Linux | `APP_PORT=8080 docker compose up -d` |
-
-y abre http://localhost:8080.
+| El puerto 80 está ocupado | Apaga con `docker compose down` y levanta en otro puerto. PowerShell: `$env:APP_PORT=8080; docker compose up -d`. CMD: `set APP_PORT=8080` y luego `docker compose up -d`. macOS o Linux: `APP_PORT=8080 docker compose up -d`. Después abre http://tucarta.localhost:8080 |
+| El puerto 5432 está ocupado | Igual que el anterior, con la variable `FORWARD_DB_PORT` (por ejemplo `5433`) |
+| Ya lo habías intentado antes | Empieza limpio: en esa carpeta corre `docker compose down -v`, borra la carpeta y vuelve a clonar |
+| `docker` no se reconoce o no conecta | Abre Docker Desktop y espera a que diga que está corriendo |
+| Las páginas cargan lento en Windows | Es normal si la carpeta está en el disco de Windows. Si tienes WSL, clona dentro de una carpeta de Ubuntu |
 
 Para apagarlo: `docker compose down`. Para borrar también la base de datos: `docker compose down -v`.
 
-## Instalación
+## Cuentas de prueba
 
-1. Clona el repositorio y entra a la carpeta:
+La contraseña de todas es `password`. Se inicia sesión en http://auth.tucarta.localhost y cada cuenta llega a su panel.
 
-   ```bash
-   git clone https://github.com/Daniel-Esparza/TuCarta.git
-   cd TuCarta
-   ```
-
-2. Copia el archivo de configuración:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Instala las dependencias de PHP usando Docker:
-
-   ```bash
-   docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/app" -w /app composer:latest composer install --ignore-platform-reqs
-   ```
-
-4. Levanta los contenedores (la primera vez tarda unos minutos):
-
-   ```bash
-   ./vendor/bin/sail up -d
-   ```
-
-5. Genera la llave de la aplicación y crea la base de datos con datos de prueba:
-
-   ```bash
-   ./vendor/bin/sail artisan key:generate
-   ./vendor/bin/sail artisan migrate --seed
-   ```
-
-   Si sale un error de conexión a `pgsql`, espera unos segundos a que PostgreSQL termine de arrancar y vuelve a correr el comando.
-
-6. Instala y compila los archivos de interfaz:
-
-   ```bash
-   ./vendor/bin/sail npm install
-   ./vendor/bin/sail npm run dev
-   ```
-
-7. Abre http://localhost en el navegador.
-
-Si el puerto 80 de tu computadora está ocupado, agrega `APP_PORT=8080` en tu `.env` y abre http://localhost:8080.
-
-### Si ya tenías el proyecto instalado
-
-El proyecto cambió de PostgreSQL 18 a PostgreSQL 16 (la versión que define el stack), y el volumen anterior de la base de datos no es compatible. Bórralo **una sola vez** y vuelve a crear la base:
-
-```bash
-./vendor/bin/sail down -v
-./vendor/bin/sail up -d
-./vendor/bin/sail artisan migrate:fresh --seed
-```
-
-## Acceso
-
-| Qué | Dirección | Notas |
+| Correo | Tipo | Qué puede hacer |
 |---|---|---|
-| Aplicación (HTTP) | http://localhost | Modo normal, sin certificado |
-| Aplicación (HTTPS) | https://tucarta.localhost y https://cualquier-negocio.tucarta.localhost | Requiere activar Traefik y generar el certificado: ver [docs/servidor.md](docs/servidor.md) |
-| Base de datos | `localhost`, puerto `5432` | Base, usuario y contraseña: los de `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD` de tu `.env`. Se puede abrir con DBeaver |
-| Estado de la aplicación | http://localhost/up | Responde 200 si Laravel está arriba |
+| `admin@tucarta.local` | Administrador | Todo el panel central |
+| `moderador@tucarta.local` | Moderador | Solo lo que le asigne el administrador; empieza sin permisos |
+| `juan@tacos-juan.tucarta.local` | Dueño de Tacos Juan | Todo el panel de su negocio |
+| `ana@sushi-ana.tucarta.local` | Dueña de Sushi Ana | Todo el panel de su negocio |
+| `marco@tacos-juan.tucarta.local` | Empleado de Tacos Juan | Avanzar pedidos y marcar agotados |
 
-Todo lo que termina en `.localhost` lo resuelven los navegadores hacia tu propia computadora, así que cualquier subdominio (`pizza-nova.tucarta.localhost`, `lo-que-sea.tucarta.localhost`) llega a la aplicación sin configurar nada.
+Negocios de prueba: `tacos-juan`, `sushi-ana`, `pizza-nova` (con carta, opciones y horario) y `dragon-z` (con carta, un producto agotado y horario).
 
-## Rutas
+## Recorrido sugerido
 
-| Ruta | Qué hace |
-|---|---|
-| `/` | Landing page: qué es TuCarta, cómo funciona el pedido por WhatsApp y el llamado a registrar un negocio |
-| `/up` | Revisión de estado de Laravel |
+1. **Público:** abre http://tucarta.localhost y registra un negocio con "Registrar mi negocio". Su dirección todavía responde "Página no disponible".
+2. **Administrador:** entra con `admin@tucarta.local`. En **Negocios pendientes** rechaza sin motivo para ver el error, y después aprueba: se muestra la contraseña temporal del dueño y la dirección del negocio ya abre.
+3. **Administrador:** en **Lista y estado de negocios** busca, filtra y suspende un negocio, y abre su dirección para ver el aviso. En **Alta de negocio** crea uno directamente, y en **Moderadores y permisos** crea un moderador y asígnale un negocio.
+4. **Dueño:** entra con `juan@tacos-juan.tucarta.local`. Edita el perfil y sube un logo, y mira el cambio en http://tacos-juan.tucarta.localhost. Crea categorías, define un horario que cruce la medianoche, activa el cierre temporal y da de alta un empleado.
+5. **Separación por negocio:** con la sesión de Juan abre http://sushi-ana.tucarta.localhost/panel. Responde 404, no 403, para no confirmar que existe.
+6. **Moderador:** entra con `moderador@tucarta.local`: la lista de negocios sale vacía y la bandeja de pendientes responde 403.
 
-Por ahora todos los subdominios muestran la misma landing. La carta de cada negocio en su subdominio, el inicio de sesión y los paneles llegan en los siguientes sprints.
+## Qué incluye
 
-## Funcionamiento actual
-
-Hasta el cierre del Sprint 4 el proyecto tiene:
-
-- **Base de datos completa del modelo del Sprint 2**, en migraciones de Laravel:
-  - Núcleo: `negocios`, `usuarios`, `permisos`, `usuario_permisos`.
-  - Catálogo: `categorias`, `items`, `grupos_opciones`, `opciones`, `horarios`.
-  - Pedidos: `pedidos`, `pedido_items`, `pedido_item_opciones`, `pedido_estado_historial`, con los tipos `tipo_entrega` y `estado_pedido`.
-- **Datos de prueba** (usuarios y negocios, ver abajo) que se cargan con `migrate --seed`.
-- **HTTPS local** con Traefik y mkcert, con redirección automática de HTTP a HTTPS.
-- **Landing page** pública.
-- **Pruebas automáticas** que corren en cada Pull Request con PostgreSQL 16.
-
-Las cuentas usan un tipo base en `usuarios.rol`: `administrador`, `negocio` o `cliente`. El moderador y el empleado no son tipos aparte: son un administrador o un negocio con menos permisos en `usuario_permisos`.
-
-## Datos de prueba
-
-Se crean con `./vendor/bin/sail artisan migrate:fresh --seed`.
-
-### Usuarios
-
-La contraseña de todas las cuentas es `password`.
-
-| Correo | Tipo | Para qué sirve |
+| Sprint | Historia | Qué hace |
 |---|---|---|
-| `admin@tucarta.local` | administrador | Administrador de la plataforma |
-| `moderador@tucarta.local` | administrador | Moderador sin ningún permiso asignado |
-| `juan@tacos-juan.tucarta.local` | negocio | Dueño de Tacos Juan |
-| `ana@sushi-ana.tucarta.local` | negocio | Dueña de Sushi Ana |
+| 4 | US-32 | Base de datos del modelo del Sprint 2, en migraciones y con datos de prueba |
+| 4 | US-17 | HTTPS con Traefik y mkcert, ver [docs/servidor.md](docs/servidor.md) |
+| 4 | US-31 | Landing page |
+| 5 | US-01 | Login unificado, bloqueo de 5 minutos tras 5 intentos y cierre de sesión |
+| 5 | US-04 | Catálogo de permisos y separación por negocio: subdominios, filtro automático y Row Level Security en PostgreSQL |
+| 5 | US-23 | Empleados con permisos limitados |
+| 5 | US-27 | Moderadores con permisos por negocio |
+| 5 y 6 | US-33, US-34 | Kit de diseño, ver [docs/kit-diseno.md](docs/kit-diseno.md) |
+| 6 | US-02a | Alta de negocio por el administrador, con la cuenta de su dueño |
+| 6 | US-02b | La dirección del negocio responde según su estado |
+| 6 | US-03 | Lista de negocios: búsqueda, filtro, paginación, suspender y reactivar |
+| 6 | US-26a | Auto-registro público |
+| 7 | US-26b | Bandeja de pendientes: aprobar o rechazar con motivo |
+| 7 | US-05 | Perfil del negocio y logo |
+| 7 | US-06 | Categorías del menú |
+| 7 | US-19a | Horarios de atención, incluso cruzando la medianoche |
+| 7 | US-19b | Cierre temporal y bloqueo de pedidos en el servidor |
 
-Las cuentas del personal de un negocio usan el formato `nombre@subdominio.tucarta.local`. El inicio de sesión todavía no está disponible: las cuentas ya existen en la base para cuando llegue.
+Llegan en sprints posteriores: productos (US-07), menú público (US-11), carrito y pedidos por WhatsApp (US-13 y US-14). Por eso la página de un negocio es provisional, y el bloqueo de pedidos y algunos permisos de empleado se comprueban en rutas de prueba.
 
-### Negocios
+## Direcciones
 
-| Subdominio | Negocio | Dueño | Carta |
-|---|---|---|---|
-| `tacos-juan` | Tacos Juan | `juan@tacos-juan.tucarta.local` | Sin productos |
-| `sushi-ana` | Sushi Ana | `ana@sushi-ana.tucarta.local` | Sin productos |
-| `pizza-nova` | Pizza Nova | Sin dueño | 2 categorías, 3 productos y horario de lunes a domingo. La Pizza Margarita tiene el grupo de opciones "Tamaño" (chica, mediana y grande) |
-| `dragon-z` | Dragon ball Z | Sin dueño | 3 categorías, 4 productos (uno marcado como agotado) y horario de 6 días |
-
-Todos los negocios están en estado `activo`.
-
-## Comandos útiles
-
-| Qué quieres hacer | Comando |
-|---|---|
-| Levantar el proyecto | `./vendor/bin/sail up -d` |
-| Apagarlo | `./vendor/bin/sail down` |
-| Recrear la base con datos de prueba | `./vendor/bin/sail artisan migrate:fresh --seed` |
-| Correr las pruebas | `./vendor/bin/sail artisan test` |
-| Ver las rutas | `./vendor/bin/sail artisan route:list --except-vendor` |
-| Abrir una terminal dentro del contenedor | `./vendor/bin/sail shell` |
-
-Tip: puedes crear un alias `sail` con `alias sail='./vendor/bin/sail'`.
-
-## Flujo de trabajo con Git (Git Flow)
-
-- `main`: versión estable, lo que se entrega.
-- `dev`: rama de integración, donde se juntan todas las historias.
-- `feature/US-XX-descripcion-corta`: una rama por historia de usuario, siempre creada desde `dev`.
+| Dirección | Quién | Qué es |
+|---|---|---|
+| `tucarta.localhost/` | Todos | Landing page |
+| `tucarta.localhost/registrar-negocio` | Todos | Auto-registro de un negocio |
+| `auth.tucarta.localhost/` | Todos | Login unificado |
+| `auth.tucarta.localhost/panel` | Administrador y moderadores | Panel central |
+| `auth.tucarta.localhost/panel/negocios` | Administrador y moderadores con permiso | Lista y estado de negocios |
+| `auth.tucarta.localhost/panel/negocios/crear` | Administrador | Alta de negocio |
+| `auth.tucarta.localhost/panel/negocios/pendientes` | Administrador | Bandeja de pendientes |
+| `auth.tucarta.localhost/panel/moderadores` | Administrador | Moderadores y permisos |
+| `{subdominio}.tucarta.localhost/` | Todos | Página del negocio |
+| `{subdominio}.tucarta.localhost/panel` | Dueño y empleados | Panel del negocio |
+| `{subdominio}.tucarta.localhost/panel/perfil` | Dueño | Perfil y logo |
+| `{subdominio}.tucarta.localhost/panel/categorias` | Dueño | Categorías del menú |
+| `{subdominio}.tucarta.localhost/panel/horarios` | Dueño | Horarios de atención |
+| `{subdominio}.tucarta.localhost/panel/cierre-temporal` | Dueño | Cierre temporal |
+| `{subdominio}.tucarta.localhost/panel/equipo` | Dueño | Equipo de trabajo |
 
 Reglas:
 
-1. Nadie sube directo a `main` ni a `dev`.
-2. Cada rama `feature/*` entra a `dev` por Pull Request.
-3. Todo Pull Request necesita la revisión de otra persona del equipo (nadie revisa el suyo).
-4. Antes de pedir revisión: corre `migrate:fresh --seed` y `artisan test` en tu rama.
-5. Una historia está terminada cuando otra persona la probó y funciona en el servidor del equipo, no solo en tu computadora.
+- Un negocio activo abre su página. Uno suspendido muestra un aviso, sin borrar su información. Uno pendiente, rechazado o que no existe responde la misma página 404, para no revelar cuál es cuál.
+- La dirección web usa solo minúsculas, números y guion, de 3 a 30 caracteres. `auth`, `www`, `admin`, `api`, `app`, `mail` y `traefik` están reservadas. La de un negocio rechazado queda libre.
+- Sin sesión, los paneles mandan al login. Quien intenta abrir algo de otro negocio recibe 404, nunca 403. Quien pertenece al negocio pero no tiene el permiso recibe 403.
 
-Ejemplo:
+Los detalles están en [docs/seguridad-por-negocio.md](docs/seguridad-por-negocio.md).
 
-```bash
-git checkout dev
-git pull
-git checkout -b feature/US-32-migraciones-nucleo
-# ...trabajas, haces commits...
-git push -u origin feature/US-32-migraciones-nucleo
-# Después abres el Pull Request hacia dev en GitHub
+## Correr las pruebas
+
+Con el proyecto levantado (tardan varios minutos en el disco de Windows):
+
+```
+docker compose exec laravel.test php artisan test
 ```
 
-## Documentación
+La base de datos se puede abrir con DBeaver en `localhost`, puerto `5432`, base `tucarta`, usuario `sail`, contraseña `password`.
 
-- [docs/servidor.md](docs/servidor.md): dominio, HTTPS con Traefik y mkcert, y los pasos para el servidor del equipo.
+## Stack
+
+- Laravel 13 (Blade, Eloquent) con PHP 8.5 y Laravel Sail (Docker)
+- PostgreSQL 16 con Row Level Security
+- Tailwind CSS y Vite
+- Traefik y mkcert para HTTPS
+- Pruebas con PHPUnit y GitHub Actions
+
+## Para el equipo
+
+La instalación con Sail, los permisos y el flujo de Git están en [docs/desarrollo.md](docs/desarrollo.md).
 
 ## Equipo
 

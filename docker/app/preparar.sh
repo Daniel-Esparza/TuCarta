@@ -21,6 +21,11 @@ if ! grep -qE '^APP_KEY=.+' .env; then
     como_usuario php artisan key:generate --force
 fi
 
+# Enlace public/storage para que se vean los logos de los negocios.
+if [ ! -e public/storage ]; then
+    como_usuario php artisan storage:link
+fi
+
 # Estilos y scripts compilados (el layout usa @vite). Con npm run dev no hace falta.
 if [ ! -f public/build/manifest.json ] && [ ! -f public/hot ]; then
     if [ ! -x node_modules/.bin/vite ]; then

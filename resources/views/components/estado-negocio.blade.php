@@ -10,8 +10,10 @@
         'rechazado'  => ['Rechazado',  'bg-brand-dark text-white border-brand-dark'],
     ];
 
-    $clave = strtolower((string) $estado);
-    [$texto, $colores] = $estados[$clave] ?? [ucfirst((string) $estado), 'bg-brand-beigeInput text-brand-dark border-brand-beigeBorder'];
+    // Acepta App\Enums\EstadoNegocio o el texto del estado.
+    $estado = $estado instanceof \BackedEnum ? $estado->value : (string) $estado;
+    $clave = strtolower($estado);
+    [$texto, $colores] = $estados[$clave] ?? [ucfirst($estado), 'bg-brand-beigeInput text-brand-dark border-brand-beigeBorder'];
 @endphp
 
 <span {{ $attributes->merge(['class' => "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap $colores"]) }}>

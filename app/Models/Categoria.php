@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PerteneceANegocio;
 use Illuminate\Database\Eloquent\Model;
 
 class Categoria extends Model
 {
+    use PerteneceANegocio;
+
     protected $fillable = ['negocio_id', 'nombre', 'orden', 'activo'];
 
     public function negocio()
@@ -16,5 +19,10 @@ class Categoria extends Model
     public function items()
     {
         return $this->hasMany(Item::class)->orderBy('nombre');
+    }
+
+    public function scopeConProductos($query)
+    {
+        return $query->whereHas('items');
     }
 }

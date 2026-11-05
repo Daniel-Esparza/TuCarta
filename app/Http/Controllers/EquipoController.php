@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ClavePermiso;
 use App\Enums\Rol;
-use App\Models\Permiso;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 
@@ -69,13 +69,8 @@ class EquipoController extends Controller
         ]);
 
         // US-23: el empleado solo avanza pedidos y marca agotados.
-        $permisos = Permiso::whereIn('clave', ['avanzar_pedidos', 'marcar_agotado'])->get();
-        foreach ($permisos as $permiso) {
-            $empleado->permisos()->create([
-                'permiso_id' => $permiso->id,
-                'negocio_id' => $negocioId,
-                'asignado_por' => $request->user()->id,
-            ]);
+        foreach ([ClavePermiso::AvanzarPedidos, ClavePermiso::MarcarAgotado] as $clave) {
+            $empleado->otorgarPermiso($clave, $request->user()->negocio, $request->user());
         }
 
         return redirect()->route('equipo.index')
