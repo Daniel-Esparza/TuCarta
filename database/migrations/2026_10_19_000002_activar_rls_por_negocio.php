@@ -2,6 +2,7 @@
 
 use App\Support\SeguridadPorFilas;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -21,15 +22,19 @@ return new class extends Migration
 
     public function up(): void
     {
-        foreach ($this->tablas as $tabla) {
-            SeguridadPorFilas::activar($tabla);
+        if (DB::getDriverName() === 'pgsql') {
+            foreach ($this->tablas as $tabla) {
+                SeguridadPorFilas::activar($tabla);
+            }
         }
     }
 
     public function down(): void
     {
-        foreach ($this->tablas as $tabla) {
-            SeguridadPorFilas::desactivar($tabla);
+        if (DB::getDriverName() === 'pgsql') {
+            foreach ($this->tablas as $tabla) {
+                SeguridadPorFilas::desactivar($tabla);
+            }
         }
     }
 };
