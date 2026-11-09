@@ -87,7 +87,16 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 Route::patch('{categoria}/subir', [CategoriaController::class, 'subir'])->name('subir');
                 Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
             });
-
+            Route::get('grupos/{grupo}', function (\App\Models\GrupoOpcion $grupo) {
+                abort_unless($grupo->negocio_id === auth()->user()->negocio_id, 404);
+                return view('opciones.grupo', compact('grupo'));
+            })->name('grupos.show');
+            Route::post('grupos/{grupo}/opciones', [\App\Http\Controllers\OpcionController::class, 'store'])
+                ->name('opciones.store');
+            Route::put('opciones/{opcion}', [\App\Http\Controllers\OpcionController::class, 'update'])
+                ->name('opciones.update');
+            Route::delete('opciones/{opcion}', [\App\Http\Controllers\OpcionController::class, 'destroy'])
+                ->name('opciones.destroy');
             // US-19a: horarios de atención
             Route::prefix('horarios')->name('horarios.')->group(function () {
                 Route::get('/', [HorarioController::class, 'index'])->name('index');
