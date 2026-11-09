@@ -20,7 +20,11 @@
             @forelse ($categoria->items as $item)
                 <article class="flex items-center justify-between gap-3 rounded-2xl border border-brand-beigeBorder bg-brand-beigeInput px-4 py-3 text-sm">
                     <span class="font-bold">{{ $item->nombre }}{{ $item->disponible_hoy ? '' : ' (agotado)' }}</span>
-                    <span>${{ number_format($item->precio, 2) }}</span>
+                    <span class="flex items-center gap-3">
+                        <span>${{ number_format($item->precio, 2) }}</span>
+                        <a href="{{ route('productos.edit', $item) }}"
+                            class="font-semibold text-brand-terracotta underline underline-offset-2">Editar</a>
+                    </span>
                 </article>
             @empty
                 <p class="rounded-2xl border border-dashed border-brand-beigeBorder px-4 py-6 text-center text-sm text-brand-dark/60">
