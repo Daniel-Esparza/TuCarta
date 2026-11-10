@@ -14,6 +14,7 @@ use App\Http\Controllers\NegocioPublicoController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Middleware\EnsureNegocioAbierto;
+use App\Http\Controllers\GrupoOpcionController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -93,6 +94,14 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 Route::get('/', [HorarioController::class, 'index'])->name('index');
                 Route::post('/', [HorarioController::class, 'store'])->name('store');
                 Route::delete('{horario}', [HorarioController::class, 'destroy'])->name('destroy');
+            });
+            
+            // US-18a: grupos de opciones de un producto
+            Route::prefix('productos/{item}/grupos')->name('grupos.')->group(function () {
+                Route::get('/', [GrupoOpcionController::class, 'index'])->name('index');
+                Route::post('/', [GrupoOpcionController::class, 'store'])->name('store');
+                Route::put('{grupo}', [GrupoOpcionController::class, 'update'])->name('update');
+                Route::delete('{grupo}', [GrupoOpcionController::class, 'destroy'])->name('destroy');
             });
 
             // US-19b: cierre temporal
