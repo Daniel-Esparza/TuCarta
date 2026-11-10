@@ -1,20 +1,15 @@
-<form method="POST" action="{{ route('opciones.store', $grupo) }}">
+@php($o = $opcion ?? null)
+
+<form method="POST" action="{{ $accion }}" class="flex flex-col gap-4">
     @csrf
-    <label>Nombre
-        <input type="text" name="nombre" value="{{ old('nombre') }}" required>
-    </label>
-    <label>Precio extra
-        <input type="number" step="0.01" name="incremento_precio" value="{{ old('incremento_precio', 0) }}" required>
-    </label>
-    @error('nombre') <p style="color:red">{{ $message }}</p> @enderror
-    @error('incremento_precio') <p style="color:red">{{ $message }}</p> @enderror
-    <button type="submit">Agregar opción</button>
+    @method($metodo)
+
+    <x-campo :id="'opcion-nombre-'.($o?->id ?? 'nueva')" nombre="nombre" etiqueta="Nombre"
+             placeholder="Queso extra" :valor="$o?->nombre" maxlength="100" required />
+
+    <x-campo :id="'opcion-precio-'.($o?->id ?? 'nueva')" nombre="incremento_precio" etiqueta="Precio extra"
+             tipo="number" step="0.01" min="0" :valor="$o?->incremento_precio ?? 0"
+             ayuda="En pesos. Puede ser 0." required />
+
+    <x-button type="submit">{{ $texto }}</x-button>
 </form>
-
-@foreach ($grupo->opciones as $opcion)
-    <div>
-        {{ $opcion->nombre }} — ${{ number_format($opcion->incremento_precio, 2) }}
-    </div>
-@endforeach
-
-@if (session('ok')) <p>{{ session('ok') }}</p> @endif

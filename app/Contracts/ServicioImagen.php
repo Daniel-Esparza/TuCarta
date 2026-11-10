@@ -7,12 +7,16 @@ use Illuminate\Http\UploadedFile;
 interface ServicioImagen
 {
     /**
-     * Guarda la imagen procesada en formato WebP y retorna la ruta relativa.
+     * Guarda la imagen y su miniatura en la carpeta del negocio.
+     *
+     * @return array{imagen: string, miniatura: string}
+     *
+     * @throws \InvalidArgumentException si el archivo no se puede leer como imagen
      */
-    public function guardar(UploadedFile $archivo, string $directorio = 'productos'): string;
+    public function guardar(UploadedFile $archivo, int $negocioId): array;
 
     /**
-     * Elimina una imagen del almacenamiento si existe.
+     * Borra la imagen y la miniatura. Las rutas nulas se ignoran.
      */
-    public function eliminar(?string $ruta): bool;
+    public function eliminar(?string $imagen, ?string $miniatura): void;
 }

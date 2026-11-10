@@ -4,7 +4,7 @@
     @csrf
     @method($metodo)
 
-    <x-campo nombre="nombre" etiqueta="Nombre del grupo" placeholder="Tamaño, Extras" :valor="$g?->nombre" required />
+    <x-campo :id="'grupo-nombre-'.($g?->id ?? 'nuevo')" nombre="nombre" etiqueta="Nombre del grupo" placeholder="Tamaño, Extras" :valor="$g?->nombre" required />
 
     <label class="flex min-h-[44px] items-center gap-3 text-sm font-medium">
         <input type="checkbox" name="es_multiple" value="1" class="h-5 w-5"

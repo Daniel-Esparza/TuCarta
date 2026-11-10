@@ -6,6 +6,8 @@
             <p class="text-sm text-brand-dark/70">{{ $producto->nombre }}</p>
         </header>
 
+        <x-button variant="outline" :href="route('grupos.index', $producto)">Grupos de opciones</x-button>
+
         <form method="POST" action="{{ route('productos.update', $producto) }}" enctype="multipart/form-data"
             class="flex flex-col gap-5 rounded-2xl border border-brand-beigeBorder p-6">
             @csrf

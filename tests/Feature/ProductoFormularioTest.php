@@ -10,6 +10,7 @@ use App\Models\Usuario;
 use Database\Seeders\PermisosSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -245,6 +246,94 @@ class ProductoFormularioTest extends TestCase
         $this->actingAs($dueno)
             ->post(route('productos.store'), $this->datosValidos($categoria) + [
                 'imagen' => UploadedFile::fake()->create('foto.jpg', 5300, 'image/jpeg'),
+            ])
+            ->assertSessionHasErrors('imagen');
+
+        $this->assertDatabaseCount('items', 0);
+    }
+
+    public function test_la_imagen_se_guarda_en_la_carpeta_del_negocio(): void
+    {
+        Storage::fake('public');
+        [$negocio, $dueno] = $this->duenoConPermiso();
+        $categoria = $this->categoria($negocio);
+
+        $this->actingAs($dueno)
+            ->post(route('productos.store'), $this->datosValidos($categoria) + [
+                'imagen' => UploadedFile::fake()->image('taco.jpg', 1600, 1200),
+            ])
+            ->assertSessionHasNoErrors();
+
+        $producto = Item::where('nombre', 'Taco al pastor')->firstOrFail();
+
+        $this->assertStringStartsWith("negocios/{$negocio->id}/productos/", $producto->imagen);
+        $this->assertStringStartsWith("negocios/{$negocio->id}/productos/", $producto->miniatura);
+        Storage::disk('public')->assertExists([$producto->imagen, $producto->miniatura]);
+    }
+
+    public function test_cambiar_la_imagen_borra_la_anterior(): void
+    {
+        Storage::fake('public');
+        [$negocio, $dueno] = $this->duenoConPermiso();
+        $categoria = $this->categoria($negocio);
+
+        Storage::disk('public')->put('negocios/1/productos/vieja.webp', 'x');
+        Storage::disk('public')->put('negocios/1/productos/vieja_miniatura.webp', 'x');
+
+        $producto = Item::create([
+            'negocio_id' => $negocio->id,
+            'categoria_id' => $categoria->id,
+            'nombre' => 'Taco',
+            'precio' => 20,
+            'imagen' => 'negocios/1/productos/vieja.webp',
+            'miniatura' => 'negocios/1/productos/vieja_miniatura.webp',
+        ]);
+
+        $this->actingAs($dueno)
+            ->put(route('productos.update', $producto), $this->datosValidos($categoria) + [
+                'imagen' => UploadedFile::fake()->image('nueva.png', 800, 800),
+            ])
+            ->assertSessionHasNoErrors();
+
+        Storage::disk('public')->assertMissing(['negocios/1/productos/vieja.webp', 'negocios/1/productos/vieja_miniatura.webp']);
+        Storage::disk('public')->assertExists($producto->fresh()->imagen);
+    }
+
+    public function test_guardar_sin_imagen_conserva_la_que_tenia(): void
+    {
+        Storage::fake('public');
+        [$negocio, $dueno] = $this->duenoConPermiso();
+        $categoria = $this->categoria($negocio);
+
+        Storage::disk('public')->put('negocios/1/productos/actual.webp', 'x');
+
+        $producto = Item::create([
+            'negocio_id' => $negocio->id,
+            'categoria_id' => $categoria->id,
+            'nombre' => 'Taco',
+            'precio' => 20,
+            'imagen' => 'negocios/1/productos/actual.webp',
+        ]);
+
+        $this->actingAs($dueno)
+            ->put(route('productos.update', $producto), $this->datosValidos($categoria))
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('negocios/1/productos/actual.webp', $producto->fresh()->imagen);
+        Storage::disk('public')->assertExists('negocios/1/productos/actual.webp');
+    }
+
+    public function test_una_imagen_danada_da_error_y_no_crea_el_producto(): void
+    {
+        Storage::fake('public');
+        [$negocio, $dueno] = $this->duenoConPermiso();
+        $categoria = $this->categoria($negocio);
+
+        $cabecera = substr(UploadedFile::fake()->image('a.jpg', 50, 50)->get(), 0, 300);
+
+        $this->actingAs($dueno)
+            ->post(route('productos.store'), $this->datosValidos($categoria) + [
+                'imagen' => UploadedFile::fake()->createWithContent('danada.jpg', $cabecera),
             ])
             ->assertSessionHasErrors('imagen');
 

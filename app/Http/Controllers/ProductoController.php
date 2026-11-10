@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\ServicioImagen;
 use App\Models\Categoria;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class ProductoController extends Controller
 {
+    public function __construct(private ServicioImagen $imagenes) {}
+
     public function create(Request $request)
     {
         $negocioId = $this->negocioDelDueno($request);
@@ -35,9 +40,7 @@ class ProductoController extends Controller
             'descripcion' => $datos['descripcion'] ?? null,
             'precio' => $datos['precio'],
             'disponible_hoy' => $request->boolean('disponible_hoy'),
-        ]);
-
-        $this->guardarImagen($request, $producto);
+        ] + $this->imagenSubida($request, $negocioId));
 
         return redirect()
             ->route('panel.negocio.categoria', $producto->categoria_id)
@@ -63,15 +66,21 @@ class ProductoController extends Controller
 
         $datos = $request->validate($this->reglas($negocioId), $this->mensajes());
 
+        $nuevas = $this->imagenSubida($request, $negocioId);
+        $imagenAnterior = $producto->imagen;
+        $miniaturaAnterior = $producto->miniatura;
+
         $producto->update([
             'categoria_id' => $datos['categoria_id'],
             'nombre' => $datos['nombre'],
             'descripcion' => $datos['descripcion'] ?? null,
             'precio' => $datos['precio'],
             'disponible_hoy' => $request->boolean('disponible_hoy'),
-        ]);
+        ] + $nuevas);
 
-        $this->guardarImagen($request, $producto);
+        if ($nuevas !== []) {
+            $this->imagenes->eliminar($imagenAnterior, $miniaturaAnterior);
+        }
 
         return redirect()
             ->route('panel.negocio.categoria', $producto->categoria_id)
@@ -83,7 +92,7 @@ class ProductoController extends Controller
         return [
             'nombre' => ['required', 'string', 'max:120'],
             'descripcion' => ['nullable', 'string'],
-            'precio' => ['required', 'numeric', 'gt:0'],
+            'precio' => ['required', 'numeric', 'gt:0', 'max:99999999.99'],
             'categoria_id' => [
                 'required', 'integer',
                 Rule::exists('categorias', 'id')->where('negocio_id', $negocioId),
@@ -100,6 +109,7 @@ class ProductoController extends Controller
             'precio.required' => 'Escribe el precio.',
             'precio.numeric' => 'El precio debe ser un número, por ejemplo 25.50.',
             'precio.gt' => 'El precio debe ser mayor a cero.',
+            'precio.max' => 'El precio es demasiado grande.',
             'categoria_id.required' => 'Elige una categoría.',
             'categoria_id.exists' => 'La categoría no es de tu negocio.',
             'imagen.image' => 'El archivo debe ser una imagen.',
@@ -108,26 +118,17 @@ class ProductoController extends Controller
         ];
     }
 
-
-    private function guardarImagen(Request $request, Item $producto): void
+    private function imagenSubida(Request $request, int $negocioId): array
     {
         if (! $request->hasFile('imagen')) {
-            return;
+            return [];
         }
 
-        if (! class_exists(\App\Services\ImagenProducto::class)) {
-            return; // US-16 pendiente: el producto se guarda sin imagen.
+        try {
+            return $this->imagenes->guardar($request->file('imagen'), $negocioId);
+        } catch (InvalidArgumentException) {
+            throw ValidationException::withMessages(['imagen' => 'No se pudo leer la imagen. Prueba con otro archivo.']);
         }
-
-        $rutas = \App\Services\ImagenProducto::guardar($request->file('imagen'), $producto->negocio_id);
-
-        
-        \App\Services\ImagenProducto::eliminar($producto->imagen, $producto->miniatura);
-
-        $producto->update([
-            'imagen' => $rutas['imagen'] ?? null,
-            'miniatura' => $rutas['miniatura'] ?? null,
-        ]);
     }
 
     private function negocioDelDueno(Request $request): int
