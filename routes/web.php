@@ -13,6 +13,7 @@ use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\NegocioPublicoController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\ProductoController;
 use App\Http\Middleware\EnsureNegocioAbierto;
 use App\Http\Controllers\GrupoOpcionController;
 use Illuminate\Support\Facades\Route;
@@ -87,6 +88,14 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 Route::delete('{categoria}', [CategoriaController::class, 'destroy'])->name('destroy');
                 Route::patch('{categoria}/subir', [CategoriaController::class, 'subir'])->name('subir');
                 Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
+            });
+
+            // US-07a: crear y editar productos del menú
+            Route::prefix('productos')->name('productos.')->group(function () {
+                Route::get('/crear', [ProductoController::class, 'create'])->name('create');
+                Route::post('/', [ProductoController::class, 'store'])->name('store');
+                Route::get('{producto}/editar', [ProductoController::class, 'edit'])->name('edit');
+                Route::put('{producto}', [ProductoController::class, 'update'])->name('update');
             });
 
             // US-19a: horarios de atención
