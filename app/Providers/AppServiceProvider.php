@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Contracts\ServicioImagen;
+use App\Services\ImagenProducto;
 use App\Support\NegocioActual;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(NegocioActual::class);
+        $this->app->bind(ServicioImagen::class, ImagenProducto::class);
     }
 
     /**

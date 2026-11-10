@@ -5,7 +5,7 @@
             <h1 class="text-xl font-extrabold">Grupos de opciones</h1>
             <p class="text-sm text-brand-dark/70">
                 Producto: {{ $producto->nombre }}. Crea grupos como "Tamaño" o "Extras".
-                Las opciones con precio se agregan en el siguiente paso.
+                Entra a cada grupo para agregar sus opciones con precio.
             </p>
         </header>
 
@@ -47,7 +47,8 @@
                         </div>
                     </details>
 
-                    <div class="mt-3">
+                    <div class="mt-3 flex flex-wrap gap-3">
+                        <x-button :href="route('grupos.show', $grupo)">Opciones ({{ $grupo->opciones->count() }})</x-button>
                         <x-confirmar :accion="route('grupos.destroy', [$producto, $grupo])" metodo="DELETE"
                                      etiqueta="Eliminar"
                                      :titulo="'Eliminar ' . $grupo->nombre"
@@ -72,9 +73,6 @@
             ])
         </section>
 
-        <a href="{{ route('categorias.index') }}"
-           class="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-brand-beigeBorder px-4 py-2.5 font-medium text-brand-dark transition-colors duration-200 hover:bg-brand-beigeCard/50 focus:outline-none focus:ring-2 focus:ring-brand-terracotta focus:ring-offset-2">
-            Volver
-        </a>
+        <x-button variant="outline" :href="route('productos.edit', $producto)">Volver al producto</x-button>
     </div>
 </x-layouts.app>
