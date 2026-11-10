@@ -6,47 +6,47 @@ use App\Models\GrupoOpcion;
 use App\Models\Opcion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class OpcionController extends Controller
 {
-    public function index(GrupoOpcion $grupo): View
-    {
-        abort_unless($grupo->negocio_id === auth()->user()->negocio_id, 404);
-
-        return view('opciones.grupo', ['grupo' => $grupo->load('item', 'opciones')]);
-    }
-
     public function store(Request $request, GrupoOpcion $grupo): RedirectResponse
     {
         abort_unless($grupo->negocio_id === auth()->user()->negocio_id, 404);
 
-        $datos = $request->validate($this->reglas(), $this->mensajes());
+        $datos = $request->validateWithBag('opcion', $this->reglas(), $this->mensajes());
 
         $grupo->opciones()->create($datos + [
             'negocio_id' => $grupo->negocio_id,
             'orden' => ($grupo->opciones()->max('orden') ?? -1) + 1,
         ]);
 
-        return redirect()->route('grupos.show', $grupo)->with('exito', 'Opción creada.');
+        return $this->volverAlGrupo($grupo, 'Opción agregada.');
     }
 
     public function update(Request $request, Opcion $opcion): RedirectResponse
     {
         abort_unless($opcion->negocio_id === auth()->user()->negocio_id, 404);
 
-        $opcion->update($request->validateWithBag('editar', $this->reglas(), $this->mensajes()));
+        $opcion->update($request->validateWithBag('opcion', $this->reglas(), $this->mensajes()));
 
-        return redirect()->route('grupos.show', $opcion->grupo_opcion_id)->with('exito', 'Opción actualizada.');
+        return $this->volverAlGrupo($opcion->grupo, 'Opción actualizada.');
     }
 
     public function destroy(Opcion $opcion): RedirectResponse
     {
         abort_unless($opcion->negocio_id === auth()->user()->negocio_id, 404);
 
+        $grupo = $opcion->grupo;
         $opcion->delete();
 
-        return redirect()->route('grupos.show', $opcion->grupo_opcion_id)->with('exito', 'Opción eliminada.');
+        return $this->volverAlGrupo($grupo, 'Opción eliminada.');
+    }
+
+    private function volverAlGrupo(GrupoOpcion $grupo, string $mensaje): RedirectResponse
+    {
+        return redirect()->route('grupos.index', $grupo->item_id)
+            ->withFragment('grupo-'.$grupo->id)
+            ->with('exito', $mensaje);
     }
 
     private function reglas(): array

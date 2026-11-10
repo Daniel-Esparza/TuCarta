@@ -108,7 +108,7 @@ class OpcionPrecioTest extends TestCase
 
         $this->actingAs($dueno)
             ->post($this->urlOpcion($dueno->negocio, $grupo), ['nombre' => 'Malo', 'incremento_precio' => -5])
-            ->assertSessionHasErrors('incremento_precio');
+            ->assertSessionHasErrorsIn('opcion', 'incremento_precio');
 
         $this->assertDatabaseMissing('opciones', ['nombre' => 'Malo']);
     }
@@ -119,11 +119,11 @@ class OpcionPrecioTest extends TestCase
         $grupo = $this->crearGrupo($dueno->negocio);
         $this->opcion($grupo);
 
-        $url = route('grupos.show', ['subdominio' => $dueno->negocio->subdominio, 'grupo' => $grupo]);
+        $url = route('grupos.index', ['subdominio' => $dueno->negocio->subdominio, 'item' => $grupo->item_id]);
 
         $this->actingAs($dueno)->get($url)
             ->assertOk()
-            ->assertSee('Opciones de Extras')
+            ->assertSee('Extras')
             ->assertSee('Queso')
             ->assertSee('15.00');
     }
