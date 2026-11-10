@@ -46,6 +46,12 @@
                         </div>
                     </div>
 
+                    <div class="mt-3 flex flex-wrap gap-3">
+                        <x-button :href="route('panel.negocio.categoria', $categoria)">Ver productos</x-button>
+                        <x-button variant="outline" :href="route('productos.create', ['categoria' => $categoria->id])">Agregar producto</x-button>
+                        <x-button variant="outline" :href="route('productos.index', ['destino' => $categoria->id])">Mover productos aquí</x-button>
+                    </div>
+
                     <details class="mt-3">
                         <summary class="inline-flex min-h-[44px] cursor-pointer items-center rounded-lg border border-brand-beigeBorder px-4 text-sm font-medium">
                             Editar nombre

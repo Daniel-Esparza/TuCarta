@@ -6,14 +6,20 @@ use App\Http\Controllers\AutoRegistroNegocioController;
 use App\Http\Controllers\BandejaPendientesController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CierreTemporalController;
+use App\Http\Controllers\CopiaOpcionesController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\HorarioController;
+use App\Http\Controllers\ListadoProductosController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\NegocioPublicoController;
+use App\Http\Controllers\OpcionController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ProductoDisponibilidadController;
 use App\Http\Middleware\EnsureNegocioAbierto;
+use App\Http\Controllers\GrupoOpcionController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -88,12 +94,37 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
             });
 
+            // US-07a y US-07b: productos del menú
+            Route::prefix('productos')->name('productos.')->group(function () {
+                Route::get('/', [ListadoProductosController::class, 'index'])->name('index');
+                Route::post('/mover', [ListadoProductosController::class, 'mover'])->name('mover');
+                Route::get('/crear', [ProductoController::class, 'create'])->name('create');
+                Route::post('/', [ProductoController::class, 'store'])->name('store');
+                Route::get('{producto}/editar', [ProductoController::class, 'edit'])->name('edit');
+                Route::put('{producto}', [ProductoController::class, 'update'])->name('update');
+                Route::delete('{producto}', [ListadoProductosController::class, 'destroy'])->name('destroy');
+            });
+
             // US-19a: horarios de atención
             Route::prefix('horarios')->name('horarios.')->group(function () {
                 Route::get('/', [HorarioController::class, 'index'])->name('index');
                 Route::post('/', [HorarioController::class, 'store'])->name('store');
                 Route::delete('{horario}', [HorarioController::class, 'destroy'])->name('destroy');
             });
+            
+            // US-18a: grupos de opciones de un producto
+            Route::prefix('productos/{item}/grupos')->name('grupos.')->group(function () {
+                Route::get('/', [GrupoOpcionController::class, 'index'])->name('index');
+                Route::post('/', [GrupoOpcionController::class, 'store'])->name('store');
+                Route::post('/copiar', [CopiaOpcionesController::class, 'store'])->name('copiar');
+                Route::put('{grupo}', [GrupoOpcionController::class, 'update'])->name('update');
+                Route::delete('{grupo}', [GrupoOpcionController::class, 'destroy'])->name('destroy');
+            });
+
+            // US-18b: opciones con precio dentro de un grupo
+            Route::post('grupos/{grupo}/opciones', [OpcionController::class, 'store'])->name('opciones.store');
+            Route::put('opciones/{opcion}', [OpcionController::class, 'update'])->name('opciones.update');
+            Route::delete('opciones/{opcion}', [OpcionController::class, 'destroy'])->name('opciones.destroy');
 
             // US-19b: cierre temporal
             Route::prefix('cierre-temporal')->name('cierre-temporal.')->group(function () {
@@ -102,6 +133,10 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
             });
         });
+
+        // US-08: producto agotado o disponible
+        Route::patch('/productos/{producto}/disponibilidad', [ProductoDisponibilidadController::class, 'alternar'])
+            ->middleware('permiso:marcar_agotado')->name('productos.disponibilidad');
 
         // Productos de una categoría (solo lectura, hasta que exista el menú)
         Route::get('/categorias/{categoria}', [PanelController::class, 'categoria'])->name('panel.negocio.categoria');
