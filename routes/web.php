@@ -6,8 +6,10 @@ use App\Http\Controllers\AutoRegistroNegocioController;
 use App\Http\Controllers\BandejaPendientesController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CierreTemporalController;
+use App\Http\Controllers\CopiaOpcionesController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\HorarioController;
+use App\Http\Controllers\ListadoProductosController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\NegocioPublicoController;
@@ -92,12 +94,15 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
             });
 
-            // US-07a: crear y editar productos del menú
+            // US-07a y US-07b: productos del menú
             Route::prefix('productos')->name('productos.')->group(function () {
+                Route::get('/', [ListadoProductosController::class, 'index'])->name('index');
+                Route::post('/mover', [ListadoProductosController::class, 'mover'])->name('mover');
                 Route::get('/crear', [ProductoController::class, 'create'])->name('create');
                 Route::post('/', [ProductoController::class, 'store'])->name('store');
                 Route::get('{producto}/editar', [ProductoController::class, 'edit'])->name('edit');
                 Route::put('{producto}', [ProductoController::class, 'update'])->name('update');
+                Route::delete('{producto}', [ListadoProductosController::class, 'destroy'])->name('destroy');
             });
 
             // US-19a: horarios de atención
@@ -111,12 +116,12 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
             Route::prefix('productos/{item}/grupos')->name('grupos.')->group(function () {
                 Route::get('/', [GrupoOpcionController::class, 'index'])->name('index');
                 Route::post('/', [GrupoOpcionController::class, 'store'])->name('store');
+                Route::post('/copiar', [CopiaOpcionesController::class, 'store'])->name('copiar');
                 Route::put('{grupo}', [GrupoOpcionController::class, 'update'])->name('update');
                 Route::delete('{grupo}', [GrupoOpcionController::class, 'destroy'])->name('destroy');
             });
 
             // US-18b: opciones con precio dentro de un grupo
-            Route::get('grupos/{grupo}', [OpcionController::class, 'index'])->name('grupos.show');
             Route::post('grupos/{grupo}/opciones', [OpcionController::class, 'store'])->name('opciones.store');
             Route::put('opciones/{opcion}', [OpcionController::class, 'update'])->name('opciones.update');
             Route::delete('opciones/{opcion}', [OpcionController::class, 'destroy'])->name('opciones.destroy');

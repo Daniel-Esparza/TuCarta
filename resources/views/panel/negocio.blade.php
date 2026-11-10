@@ -18,6 +18,9 @@
                 <x-tarjeta-enlace :href="route('categorias.index')" titulo="Categorías del menú">
                     Crea, edita, elimina y ordena tus categorías.
                 </x-tarjeta-enlace>
+                <x-tarjeta-enlace :href="route('productos.index')" titulo="Productos del menú">
+                    Busca, filtra, edita y elimina tus productos.
+                </x-tarjeta-enlace>
                 <x-tarjeta-enlace :href="route('horarios.index')" titulo="Horarios de atención">
                     Define qué días y a qué horas atiendes.
                 </x-tarjeta-enlace>

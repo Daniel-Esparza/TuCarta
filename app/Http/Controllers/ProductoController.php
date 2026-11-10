@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Contracts\ServicioImagen;
 use App\Models\Categoria;
+use App\Models\GrupoOpcion;
 use App\Models\Item;
+use App\Services\CopiarOpciones;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -12,7 +14,7 @@ use InvalidArgumentException;
 
 class ProductoController extends Controller
 {
-    public function __construct(private ServicioImagen $imagenes) {}
+    public function __construct(private ServicioImagen $imagenes, private CopiarOpciones $copiado) {}
 
     public function create(Request $request)
     {
@@ -25,6 +27,11 @@ class ProductoController extends Controller
         return view('productos.create', [
             'categorias' => $categorias,
             'categoriaInicial' => $request->query('categoria'),
+            'plantillas' => Item::where('negocio_id', $negocioId)
+                ->whereHas('gruposOpciones')
+                ->withCount('gruposOpciones')
+                ->orderBy('nombre')
+                ->get(),
         ]);
     }
 
@@ -42,9 +49,12 @@ class ProductoController extends Controller
             'disponible_hoy' => $request->boolean('disponible_hoy'),
         ] + $this->imagenSubida($request, $negocioId));
 
-        return redirect()
-            ->route('panel.negocio.categoria', $producto->categoria_id)
-            ->with('exito', 'Producto creado.');
+        if (! empty($datos['copiar_de'])) {
+            $grupos = GrupoOpcion::where('item_id', $datos['copiar_de'])->with('opciones')->get();
+            $this->copiado->copiar($grupos, [$producto->id]);
+        }
+
+        return redirect()->route('productos.index')->with('exito', "Se creó {$producto->nombre}.");
     }
 
     public function edit(Request $request, Item $producto)
@@ -82,9 +92,7 @@ class ProductoController extends Controller
             $this->imagenes->eliminar($imagenAnterior, $miniaturaAnterior);
         }
 
-        return redirect()
-            ->route('panel.negocio.categoria', $producto->categoria_id)
-            ->with('exito', 'Producto actualizado.');
+        return redirect()->route('productos.index')->with('exito', "Se guardó {$producto->nombre}.");
     }
 
     private function reglas(int $negocioId): array
@@ -98,6 +106,7 @@ class ProductoController extends Controller
                 Rule::exists('categorias', 'id')->where('negocio_id', $negocioId),
             ],
             'imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'copiar_de' => ['nullable', 'integer', Rule::exists('items', 'id')->where('negocio_id', $negocioId)],
         ];
     }
 

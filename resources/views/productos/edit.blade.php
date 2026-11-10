@@ -6,7 +6,7 @@
             <p class="text-sm text-brand-dark/70">{{ $producto->nombre }}</p>
         </header>
 
-        <x-button variant="outline" :href="route('grupos.index', $producto)">Grupos de opciones</x-button>
+        <x-button variant="outline" :href="route('grupos.index', $producto)">Opciones del producto</x-button>
 
         <form method="POST" action="{{ route('productos.update', $producto) }}" enctype="multipart/form-data"
             class="flex flex-col gap-5 rounded-2xl border border-brand-beigeBorder p-6">
@@ -52,7 +52,7 @@
 
             <div class="flex flex-wrap items-center gap-3">
                 <x-button type="submit">Guardar cambios</x-button>
-                <x-button variant="outline" :href="route('panel.negocio.categoria', $producto->categoria_id)">
+                <x-button variant="outline" :href="route('productos.index')">
                     Cancelar
                 </x-button>
             </div>

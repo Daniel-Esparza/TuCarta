@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\GrupoOpcion;
 use App\Models\Item;
 use Illuminate\Http\Request;
@@ -21,7 +22,13 @@ class GrupoOpcionController extends Controller
             ->orderBy('orden')->orderBy('id')
             ->get();
 
-        return view('productos.grupos', ['producto' => $item, 'grupos' => $grupos]);
+        $categorias = Categoria::where('negocio_id', $negocioId)
+            ->with(['items' => fn ($consulta) => $consulta->whereKeyNot($item->id)->orderBy('nombre')])
+            ->orderBy('orden')->orderBy('id')
+            ->get()
+            ->filter(fn ($categoria) => $categoria->items->isNotEmpty());
+
+        return view('productos.grupos', ['producto' => $item, 'grupos' => $grupos, 'categorias' => $categorias]);
     }
 
     public function store(Request $request, Item $item)

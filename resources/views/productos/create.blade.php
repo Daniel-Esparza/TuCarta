@@ -30,6 +30,17 @@
                 @endforeach
             </x-select>
 
+            @if ($plantillas->isNotEmpty())
+                <x-select nombre="copiar_de" etiqueta="Copiar opciones de otro producto (opcional)">
+                    <option value="">No copiar</option>
+                    @foreach ($plantillas as $plantilla)
+                        <option value="{{ $plantilla->id }}" @selected(old('copiar_de') == $plantilla->id)>
+                            {{ $plantilla->nombre }} ({{ $plantilla->grupos_opciones_count }} grupos)
+                        </option>
+                    @endforeach
+                </x-select>
+            @endif
+
             <x-campo nombre="imagen" etiqueta="Imagen (opcional)" tipo="file"
                 ayuda="JPG, PNG o WebP de 5 MB máximo." />
 
@@ -48,7 +59,7 @@
             <div class="flex flex-wrap items-center gap-3">
                 <x-button type="submit">Guardar producto</x-button>
                 <x-button variant="outline"
-                    :href="$categoriaInicial ? route('panel.negocio.categoria', $categoriaInicial) : route('panel.negocio')">
+                    :href="$categoriaInicial ? route('panel.negocio.categoria', $categoriaInicial) : route('productos.index')">
                     Cancelar
                 </x-button>
             </div>

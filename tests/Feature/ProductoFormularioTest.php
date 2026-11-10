@@ -57,7 +57,7 @@ class ProductoFormularioTest extends TestCase
 
         $this->actingAs($dueno)
             ->post(route('productos.store'), $this->datosValidos($categoria))
-            ->assertRedirect(route('panel.negocio.categoria', $categoria->id))
+            ->assertRedirect(route('productos.index'))
             ->assertSessionHas('exito');
 
         $this->assertDatabaseHas('items', [
@@ -81,7 +81,7 @@ class ProductoFormularioTest extends TestCase
                 'precio' => 35,
                 'categoria_id' => $categoria->id,
             ])
-            ->assertRedirect(route('panel.negocio.categoria', $categoria->id));
+            ->assertRedirect(route('productos.index'));
 
         $this->assertDatabaseHas('items', [
             'nombre' => 'Flan casero',
@@ -109,7 +109,7 @@ class ProductoFormularioTest extends TestCase
                 'precio' => '22',
                 'categoria_id' => $bebidas->id,
             ])
-            ->assertRedirect(route('panel.negocio.categoria', $bebidas->id))
+            ->assertRedirect(route('productos.index'))
             ->assertSessionHas('exito');
 
         $this->assertDatabaseHas('items', [

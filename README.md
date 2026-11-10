@@ -55,7 +55,7 @@ Negocios de prueba: `tacos-juan`, `sushi-ana`, `pizza-nova` (con carta, opciones
 1. **Público:** abre http://tucarta.localhost y registra un negocio con "Registrar mi negocio". Su dirección todavía responde "Página no disponible".
 2. **Administrador:** entra con `admin@tucarta.local`. En **Negocios pendientes** rechaza sin motivo para ver el error, y después aprueba: se muestra la contraseña temporal del dueño y la dirección del negocio ya abre.
 3. **Administrador:** en **Lista y estado de negocios** busca, filtra y suspende un negocio, y abre su dirección para ver el aviso. En **Alta de negocio** crea uno directamente, y en **Moderadores y permisos** crea un moderador y asígnale un negocio.
-4. **Dueño:** entra con `juan@tacos-juan.tucarta.local`. Edita el perfil y sube un logo, y mira el cambio en http://tacos-juan.tucarta.localhost. Crea categorías, define un horario que cruce la medianoche, activa el cierre temporal y da de alta un empleado.
+4. **Dueño:** entra con `juan@tacos-juan.tucarta.local`. Edita el perfil y sube un logo, y mira el cambio en http://tacos-juan.tucarta.localhost. Crea categorías y productos con foto, agrégales opciones con precio extra, busca y filtra en **Productos del menú**, marca uno como agotado, define un horario que cruce la medianoche, activa el cierre temporal y da de alta un empleado.
 5. **Separación por negocio:** con la sesión de Juan abre http://sushi-ana.tucarta.localhost/panel. Responde 404, no 403, para no confirmar que existe.
 6. **Moderador:** entra con `moderador@tucarta.local`: la lista de negocios sale vacía y la bandeja de pendientes responde 403.
 
@@ -80,8 +80,13 @@ Negocios de prueba: `tacos-juan`, `sushi-ana`, `pizza-nova` (con carta, opciones
 | 7 | US-06 | Categorías del menú |
 | 7 | US-19a | Horarios de atención, incluso cruzando la medianoche |
 | 7 | US-19b | Cierre temporal y bloqueo de pedidos en el servidor |
+| 8 | US-07a | Crear y editar productos |
+| 8 | US-07b | Lista de productos: búsqueda, filtros y eliminar con confirmación |
+| 8 | US-16 | Fotos optimizadas: WebP de 1200 px, miniatura de 400 px y carpeta por negocio |
+| 8 | US-18a, US-18b | Grupos de opciones de un producto, opciones con precio extra y copia a muchos productos a la vez |
+| 8 | US-08 | Marcar un producto agotado o disponible sin recargar la página |
 
-Llegan en sprints posteriores: productos (US-07), menú público (US-11), carrito y pedidos por WhatsApp (US-13 y US-14). Por eso la página de un negocio es provisional, y el bloqueo de pedidos y algunos permisos de empleado se comprueban en rutas de prueba.
+Llegan en sprints posteriores: menú público (US-11), carrito y pedidos por WhatsApp (US-13 y US-14). Por eso la página de un negocio es provisional, y el bloqueo de pedidos y algunos permisos de empleado se comprueban en rutas de prueba.
 
 ## Direcciones
 
@@ -99,6 +104,7 @@ Llegan en sprints posteriores: productos (US-07), menú público (US-11), carrit
 | `{subdominio}.tucarta.localhost/panel` | Dueño y empleados | Panel del negocio |
 | `{subdominio}.tucarta.localhost/panel/perfil` | Dueño | Perfil y logo |
 | `{subdominio}.tucarta.localhost/panel/categorias` | Dueño | Categorías del menú |
+| `{subdominio}.tucarta.localhost/panel/productos` | Dueño | Productos del menú |
 | `{subdominio}.tucarta.localhost/panel/horarios` | Dueño | Horarios de atención |
 | `{subdominio}.tucarta.localhost/panel/cierre-temporal` | Dueño | Cierre temporal |
 | `{subdominio}.tucarta.localhost/panel/equipo` | Dueño | Equipo de trabajo |
