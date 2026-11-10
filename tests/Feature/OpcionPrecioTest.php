@@ -9,6 +9,8 @@ use App\Models\Negocio;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Enums\ClavePermiso;
+use Database\Seeders\PermisosSeeder;
 
 class OpcionPrecioTest extends TestCase
 {
@@ -42,51 +44,59 @@ class OpcionPrecioTest extends TestCase
         ]);
     }
 
+    private function urlOpcion(Negocio $negocio, GrupoOpcion $grupo): string
+    {
+        return route('opciones.store', [
+            'subdominio' => $negocio->subdominio,
+            'grupo' => $grupo,
+        ]);
+    }
+
     public function test_crea_opcion_con_incremento_precio(): void
     {
         $dueno = Usuario::factory()->deNegocio()->create();
+        $this->seed(PermisosSeeder::class);
+        $dueno->otorgarPermiso(ClavePermiso::EditarPerfil, $dueno->negocio);
         $grupo = $this->crearGrupo($dueno->negocio);
 
         $this->actingAs($dueno)
-            ->post(route('opciones.store', $grupo), ['nombre' => 'Queso', 'incremento_precio' => 15])
+            ->post($this->urlOpcion($dueno->negocio, $grupo), ['nombre' => 'Queso', 'incremento_precio' => 15])
             ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('opciones', [
             'nombre' => 'Queso',
             'incremento_precio' => 15,
         ]);
-    }
-
-    public function test_precio_cero_se_permite(): void
+	    }    public function test_precio_cero_se_permite(): void
     {
         $dueno = Usuario::factory()->deNegocio()->create();
         $grupo = $this->crearGrupo($dueno->negocio);
 
         $this->actingAs($dueno)
-            ->post(route('opciones.store', $grupo), ['nombre' => 'Sin extra', 'incremento_precio' => 0])
+            ->post($this->urlOpcion($dueno->negocio, $grupo), ['nombre' => 'Sin extra', 'incremento_precio' => 0])
             ->assertSessionHasNoErrors();
     }
 
     public function test_precio_negativo_da_error(): void
     {
         $dueno = Usuario::factory()->deNegocio()->create();
+        $this->seed(PermisosSeeder::class);
+        $dueno->otorgarPermiso(ClavePermiso::EditarPerfil, $dueno->negocio);
         $grupo = $this->crearGrupo($dueno->negocio);
 
         $this->actingAs($dueno)
-            ->post(route('opciones.store', $grupo), ['nombre' => 'Malo', 'incremento_precio' => -5])
+            ->post($this->urlOpcion($dueno->negocio, $grupo), ['nombre' => 'Malo', 'incremento_precio' => -5])
             ->assertSessionHasErrors('incremento_precio');
 
         $this->assertDatabaseMissing('opciones', ['nombre' => 'Malo']);
-    }
-
-    public function test_grupo_de_otro_negocio_responde_404(): void
+    }    public function test_grupo_de_otro_negocio_responde_404(): void
     {
         $dueno = Usuario::factory()->deNegocio()->create();
         $otroNegocio = Negocio::factory()->create();
         $grupoAjeno = $this->crearGrupo($otroNegocio);
 
         $this->actingAs($dueno)
-            ->post(route('opciones.store', $grupoAjeno), ['nombre' => 'X', 'incremento_precio' => 1])
+            ->post($this->urlOpcion($otroNegocio, $grupoAjeno), ['nombre' => 'X', 'incremento_precio' => 1])
             ->assertNotFound();
     }
 }

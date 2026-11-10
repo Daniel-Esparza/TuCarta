@@ -91,6 +91,8 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
                 abort_unless($grupo->negocio_id === auth()->user()->negocio_id, 404);
                 return view('opciones.grupo', compact('grupo'));
             })->name('grupos.show');
+            Route::patch('productos/{producto}/disponibilidad', [\App\Http\Controllers\ProductoDisponibilidadController::class, 'alternar'])
+                ->name('productos.disponibilidad');
             Route::post('grupos/{grupo}/opciones', [\App\Http\Controllers\OpcionController::class, 'store'])
                 ->name('opciones.store');
             Route::put('opciones/{opcion}', [\App\Http\Controllers\OpcionController::class, 'update'])
