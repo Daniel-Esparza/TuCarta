@@ -12,6 +12,7 @@ use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ListadoProductosController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
+use App\Http\Controllers\MenuPublicoController;
 use App\Http\Controllers\NegocioPublicoController;
 use App\Http\Controllers\OpcionController;
 use App\Http\Controllers\PanelController;
@@ -64,6 +65,9 @@ Route::domain('auth.'.$dominio)->group(function () {
 Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function () {
     // US-02b: página provisional hasta que exista el menú (US-11)
     Route::get('/', [NegocioPublicoController::class, 'mostrar'])->name('negocio.publico');
+
+    // US-12b: detalle de producto
+    Route::get('/producto/{item}', [MenuPublicoController::class, 'detalle'])->name('menu.detalle');
 
     // US-19b: ruta de prueba. Cuando exista el envío real de pedidos, el middleware va en esa ruta.
     Route::get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
