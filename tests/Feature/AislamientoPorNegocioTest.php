@@ -75,6 +75,13 @@ class AislamientoPorNegocioTest extends TestCase
                 continue;
             }
 
+            if ($reservado === 'www') {
+                // www lleva a la página principal (US-11a)
+                $this->get($this->url($reservado))->assertStatus(301);
+
+                continue;
+            }
+
             $this->get($this->url($reservado))->assertNotFound();
         }
     }

@@ -28,6 +28,24 @@ Subdominios reservados, que nunca son negocio: `auth`, `www`, `admin`, `api`, `a
 - Al rechazar se guarda el motivo y la dirección queda libre: el índice único de `subdominio` no cuenta a los rechazados. Quien busque un negocio por subdominio debe excluirlos.
 - Nadie crea migraciones de `negocios` por su cuenta: los cambios de base de datos se piden a quien lleva el Bloque 1.
 
+## Negocio de la dirección (US-11a)
+
+El middleware `negocio` lee el subdominio, busca el negocio y lo deja disponible de **una sola forma** para el resto de la petición:
+
+| Dónde | Cómo se usa |
+|---|---|
+| Controladores | Inyectar `App\Support\NegocioActual` y llamar `$negocioActual->negocio()` o `$negocioActual->id()` |
+| Vistas | La variable `$negocio`, compartida con todas las vistas de la dirección |
+| Consultas | Ya vienen filtradas: el filtro de Eloquent y el RLS usan ese mismo negocio |
+
+Reglas:
+
+- El negocio nunca sale de un dato de la petición (`negocio_id`, un campo oculto o la sesión). Aunque llegue uno, se ignora.
+- La dirección no distingue mayúsculas: `Tacos-Juan.tucarta.localhost` abre `tacos-juan`.
+- `www` lleva a la página principal. `auth` es el login. `admin`, `api`, `app`, `mail` y `traefik` responden 404 aunque exista un negocio con ese nombre.
+- Las rutas públicas (menú y detalle) y las del panel viven en grupos separados de `routes/web.php`, con la misma dirección. La landing y el auto-registro solo abren en el dominio principal (middleware `dominio.principal`).
+- Por HTTPS no hay que configurar nada para un negocio nuevo: Traefik manda cualquier subdominio a Laravel con el certificado comodín (US-17), y lo que llega por HTTP se redirige a HTTPS.
+
 ## Middleware
 
 | Alias | Qué hace | Dónde se usa |

@@ -25,7 +25,7 @@ class NegocioDireccionTest extends TestCase
         ]);
     }
 
-    public function test_negocio_activo_muestra_la_pagina_provisional(): void
+    public function test_negocio_activo_sin_productos_muestra_su_aviso_de_menu_vacio(): void
     {
         $this->negocio('tacos-juan', 'activo', 'Tacos Juan');
 

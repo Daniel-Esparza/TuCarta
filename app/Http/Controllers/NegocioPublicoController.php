@@ -19,7 +19,7 @@ class NegocioPublicoController extends Controller
         $categorias = $negocio->categorias()
             ->orderBy('orden')->orderBy('id')
             ->whereHas('items', fn ($q) => $q->where('activo', true))
-            ->with(['items' => fn ($q) => $q->where('activo', true)])
+            ->with(['items' => fn ($q) => $q->where('activo', true)->orderBy('nombre')])
             ->get();
 
         return view('negocio.menu', [
