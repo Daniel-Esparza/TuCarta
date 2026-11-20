@@ -34,13 +34,13 @@ class CarritoTest extends TestCase
         ]);
     }
 
-    /**
-     * Ejecuta JavaScript con node y decodifica su salida JSON:
-     * se prueba el mismo archivo que corre el navegador
-     * (public/js/carrito-calculo.js), no una copia.
-     */
+
     private function node(string $javascript): array
     {
+
+        $ruta = json_encode(public_path('js/carrito-calculo.js'), JSON_UNESCAPED_SLASHES);
+        $javascript = str_replace('__CALCULO__', $ruta, $javascript);
+
         $proceso = new Process(['node', '-e', $javascript]);
         $proceso->run();
 
@@ -143,7 +143,7 @@ const estructura = C.estructuraPedido(12, [
 console.log(JSON.stringify(estructura));
 JS);
 
-        // Acuerdo US-13/US-14a: el navegador manda producto, cantidad y opciones. Nunca precios.
+        
         $this->assertSame(12, $r['negocio_id']);
         $this->assertCount(2, $r['lineas']);
         $this->assertSame(['producto_id', 'cantidad', 'opciones'], array_keys($r['lineas'][0]));
