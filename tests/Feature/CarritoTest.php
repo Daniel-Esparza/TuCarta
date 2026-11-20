@@ -85,7 +85,7 @@ class CarritoTest extends TestCase
     public function test_subtotales_y_total_salen_correctos_incluidas_opciones_con_precio_extra(): void
     {
         $r = $this->node(<<<'JS'
-const C = require('/var/www/html/public/js/carrito-calculo.js');
+const C = require(__CALCULO__);
 const items = [
     { id: 1, precio: 25, grupos: [] },
     { id: 2, precio: 40, grupos: [
@@ -117,7 +117,7 @@ JS);
     public function test_el_mismo_producto_con_opciones_distintas_ocupa_lineas_distintas(): void
     {
         $r = $this->node(<<<'JS'
-const C = require('/var/www/html/public/js/carrito-calculo.js');
+const C = require(__CALCULO__);
 console.log(JSON.stringify({
     claves: [
         C.claveLinea({ producto_id: 2, opciones: [111, 102] }),
@@ -135,7 +135,7 @@ JS);
     public function test_la_estructura_del_pedido_nunca_incluye_precios(): void
     {
         $r = $this->node(<<<'JS'
-const C = require('/var/www/html/public/js/carrito-calculo.js');
+const C = require(__CALCULO__);
 const estructura = C.estructuraPedido(12, [
     { producto_id: 48, cantidad: 2, opciones: [103, 107], nombre: 'Taco', precio_unitario: 25 },
     { producto_id: 51, cantidad: 1, opciones: [] },
