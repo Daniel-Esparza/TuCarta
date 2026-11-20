@@ -8,9 +8,9 @@ use Illuminate\View\View;
 class NegocioPublicoController extends Controller
 {
     /**
-     * US-12a: la dirección pública de un negocio activo muestra su carta.
+     * US-12a + US-13: la dirección pública de un negocio activo muestra su carta
+     * con los datos que el carrito del navegador necesita.
      * Los demás estados los resuelve el middleware "negocio" antes de llegar aquí.
-     * Categorías con productos activos, en el orden del dueño, con carga ansiosa.
      */
     public function mostrar(NegocioActual $negocioActual): View
     {
@@ -19,13 +19,14 @@ class NegocioPublicoController extends Controller
         $categorias = $negocio->categorias()
             ->orderBy('orden')->orderBy('id')
             ->whereHas('items', fn ($q) => $q->where('activo', true))
-            ->with(['items' => fn ($q) => $q->where('activo', true)->orderBy('nombre')])
+            ->with(['items' => fn ($q) => $q->where('activo', true)->with('gruposOpciones.opciones')])
             ->get();
 
         return view('negocio.menu', [
-            'negocio' => $negocio,
+            'negocio'    => $negocio,
             'categorias' => $categorias,
-            'horarios' => $negocio->horarios()->get()->groupBy('dia_semana')->sortKeys(),
+            'horarios'   => $negocio->horarios()->get()->groupBy('dia_semana')->sortKeys(),
+            'itemsMenu'  => $categorias->flatMap(fn ($c) => $c->items),
         ]);
     }
 }

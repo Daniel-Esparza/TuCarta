@@ -70,4 +70,5 @@
             </p>
         @endif
     </div>
+    <x-carrito-scripts :negocio="$negocio" :items="$itemsMenu" />
 </x-layouts.app>
