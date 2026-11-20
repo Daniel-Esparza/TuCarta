@@ -71,6 +71,7 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
 
     // US-12b: detalle de producto
     Route::get('/producto/{item}', [MenuPublicoController::class, 'detalle'])->name('menu.detalle');
+    Route::get('/carrito', [\App\Http\Controllers\MenuPublicoController::class, 'carrito'])->name('menu.carrito');
 
     // US-19b: ruta de prueba. Cuando exista el envío real de pedidos, el middleware va en esa ruta.
     Route::get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
