@@ -48,7 +48,7 @@ La contraseña de todas es `password`. Se inicia sesión en http://auth.tucarta.
 | `ana@sushi-ana.tucarta.local` | Dueña de Sushi Ana | Todo el panel de su negocio |
 | `marco@tacos-juan.tucarta.local` | Empleado de Tacos Juan | Avanzar pedidos y marcar agotados |
 
-Negocios de prueba: `tacos-juan`, `sushi-ana`, `pizza-nova` (con carta, opciones y horario) y `dragon-z` (con carta, un producto agotado y horario).
+Negocios de prueba, cada uno con su menú: http://tacos-juan.tucarta.localhost, http://sushi-ana.tucarta.localhost, http://pizza-nova.tucarta.localhost y http://dragon-z.tucarta.localhost.
 
 ## Recorrido sugerido
 
@@ -85,8 +85,12 @@ Negocios de prueba: `tacos-juan`, `sushi-ana`, `pizza-nova` (con carta, opciones
 | 8 | US-16 | Fotos optimizadas: WebP de 1200 px, miniatura de 400 px y carpeta por negocio |
 | 8 | US-18a, US-18b | Grupos de opciones de un producto, opciones con precio extra y copia a muchos productos a la vez |
 | 8 | US-08 | Marcar un producto agotado o disponible sin recargar la página |
+| 9 | US-11a | Cada negocio se identifica por su dirección, con sus datos separados y sobre HTTPS |
+| 9 | US-11b | Página de error propia y aviso de negocio suspendido |
+| 9 | US-12a | Menú público por categorías, en el orden del dueño |
+| 9 | US-12b | Detalle de producto con sus opciones y productos agotados |
 
-Llegan en sprints posteriores: menú público (US-11), carrito y pedidos por WhatsApp (US-13 y US-14). Por eso la página de un negocio es provisional, y el bloqueo de pedidos y algunos permisos de empleado se comprueban en rutas de prueba.
+Llegan en sprints posteriores: carrito y pedidos por WhatsApp (US-13 y US-14). Por eso el bloqueo de pedidos y algunos permisos de empleado se comprueban en rutas de prueba.
 
 ## Direcciones
 
@@ -100,7 +104,8 @@ Llegan en sprints posteriores: menú público (US-11), carrito y pedidos por Wha
 | `auth.tucarta.localhost/panel/negocios/crear` | Administrador | Alta de negocio |
 | `auth.tucarta.localhost/panel/negocios/pendientes` | Administrador | Bandeja de pendientes |
 | `auth.tucarta.localhost/panel/moderadores` | Administrador | Moderadores y permisos |
-| `{subdominio}.tucarta.localhost/` | Todos | Página del negocio |
+| `{subdominio}.tucarta.localhost/` | Todos | Menú público del negocio |
+| `{subdominio}.tucarta.localhost/producto/{id}` | Todos | Detalle de un producto |
 | `{subdominio}.tucarta.localhost/panel` | Dueño y empleados | Panel del negocio |
 | `{subdominio}.tucarta.localhost/panel/perfil` | Dueño | Perfil y logo |
 | `{subdominio}.tucarta.localhost/panel/categorias` | Dueño | Categorías del menú |

@@ -12,6 +12,7 @@ use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ListadoProductosController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
+use App\Http\Controllers\MenuPublicoController;
 use App\Http\Controllers\NegocioPublicoController;
 use App\Http\Controllers\OpcionController;
 use App\Http\Controllers\PanelController;
@@ -60,104 +61,113 @@ Route::domain('auth.'.$dominio)->group(function () {
     });
 });
 
-// Todo lo de un negocio vive en su subdominio.
+// US-11a: cada negocio vive en {subdominio}.{dominio}. El middleware "negocio" lo identifica
+// por la dirección y lo deja en NegocioActual (ver docs/seguridad-por-negocio.md).
+
+// Menú público: no pide sesión.
 Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function () {
-    // US-02b: página provisional hasta que exista el menú (US-11)
+    // US-12a: menú por categorías
     Route::get('/', [NegocioPublicoController::class, 'mostrar'])->name('negocio.publico');
+
+    // US-12b: detalle de producto
+    Route::get('/producto/{item}', [MenuPublicoController::class, 'detalle'])->name('menu.detalle');
 
     // US-19b: ruta de prueba. Cuando exista el envío real de pedidos, el middleware va en esa ruta.
     Route::get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
         ->middleware(EnsureNegocioAbierto::class)->name('prueba.enviar-pedido');
-
-    Route::middleware(['auth', 'negocio.propio'])->prefix('panel')->group(function () {
-        Route::get('/', [PanelController::class, 'negocio'])->name('panel.negocio');
-
-        // US-23: equipo de trabajo del dueño
-        Route::middleware('permiso:gestionar_equipo')->group(function () {
-            Route::get('/equipo', [EquipoController::class, 'index'])->name('equipo.index');
-            Route::post('/equipo', [EquipoController::class, 'store'])->name('equipo.store');
-            Route::patch('/equipo/{empleado}/desactivar', [EquipoController::class, 'desactivar'])->name('equipo.desactivar');
-        });
-
-        Route::middleware('permiso:editar_perfil')->group(function () {
-            // US-05: perfil del negocio
-            Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
-            Route::patch('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
-
-            // US-06: categorías del menú
-            Route::prefix('categorias')->name('categorias.')->group(function () {
-                Route::get('/', [CategoriaController::class, 'index'])->name('index');
-                Route::post('/', [CategoriaController::class, 'store'])->name('store');
-                Route::put('{categoria}', [CategoriaController::class, 'update'])->name('update');
-                Route::delete('{categoria}', [CategoriaController::class, 'destroy'])->name('destroy');
-                Route::patch('{categoria}/subir', [CategoriaController::class, 'subir'])->name('subir');
-                Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
-            });
-
-            // US-07a y US-07b: productos del menú
-            Route::prefix('productos')->name('productos.')->group(function () {
-                Route::get('/', [ListadoProductosController::class, 'index'])->name('index');
-                Route::post('/mover', [ListadoProductosController::class, 'mover'])->name('mover');
-                Route::get('/crear', [ProductoController::class, 'create'])->name('create');
-                Route::post('/', [ProductoController::class, 'store'])->name('store');
-                Route::get('{producto}/editar', [ProductoController::class, 'edit'])->name('edit');
-                Route::put('{producto}', [ProductoController::class, 'update'])->name('update');
-                Route::delete('{producto}', [ListadoProductosController::class, 'destroy'])->name('destroy');
-            });
-
-            // US-19a: horarios de atención
-            Route::prefix('horarios')->name('horarios.')->group(function () {
-                Route::get('/', [HorarioController::class, 'index'])->name('index');
-                Route::post('/', [HorarioController::class, 'store'])->name('store');
-                Route::delete('{horario}', [HorarioController::class, 'destroy'])->name('destroy');
-            });
-            
-            // US-18a: grupos de opciones de un producto
-            Route::prefix('productos/{item}/grupos')->name('grupos.')->group(function () {
-                Route::get('/', [GrupoOpcionController::class, 'index'])->name('index');
-                Route::post('/', [GrupoOpcionController::class, 'store'])->name('store');
-                Route::post('/copiar', [CopiaOpcionesController::class, 'store'])->name('copiar');
-                Route::put('{grupo}', [GrupoOpcionController::class, 'update'])->name('update');
-                Route::delete('{grupo}', [GrupoOpcionController::class, 'destroy'])->name('destroy');
-            });
-
-            // US-18b: opciones con precio dentro de un grupo
-            Route::post('grupos/{grupo}/opciones', [OpcionController::class, 'store'])->name('opciones.store');
-            Route::put('opciones/{opcion}', [OpcionController::class, 'update'])->name('opciones.update');
-            Route::delete('opciones/{opcion}', [OpcionController::class, 'destroy'])->name('opciones.destroy');
-
-            // US-19b: cierre temporal
-            Route::prefix('cierre-temporal')->name('cierre-temporal.')->group(function () {
-                Route::get('/', [CierreTemporalController::class, 'index'])->name('index');
-                Route::patch('/cerrar', [CierreTemporalController::class, 'cerrar'])->name('cerrar');
-                Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
-            });
-        });
-
-        // US-08: producto agotado o disponible
-        Route::patch('/productos/{producto}/disponibilidad', [ProductoDisponibilidadController::class, 'alternar'])
-            ->middleware('permiso:marcar_agotado')->name('productos.disponibilidad');
-
-        // Productos de una categoría (solo lectura, hasta que exista el menú)
-        Route::get('/categorias/{categoria}', [PanelController::class, 'categoria'])->name('panel.negocio.categoria');
-
-        // US-23: rutas de prueba de cada permiso, hasta que existan sus pantallas
-        Route::get('/prueba/avanzar-pedidos', fn () => 'Permiso avanzar_pedidos: OK')
-            ->middleware('permiso:avanzar_pedidos')->name('prueba.avanzar-pedidos');
-        Route::get('/prueba/marcar-agotado', fn () => 'Permiso marcar_agotado: OK')
-            ->middleware('permiso:marcar_agotado')->name('prueba.marcar-agotado');
-        Route::get('/prueba/ver-metricas', fn () => 'Permiso ver_metricas: OK')
-            ->middleware('permiso:ver_metricas')->name('prueba.ver-metricas');
-        Route::get('/prueba/editar-precios', fn () => 'Permiso editar_precios: OK')
-            ->middleware('permiso:editar_precios')->name('prueba.editar-precios');
-        Route::get('/prueba/editar-perfil', fn () => 'Permiso editar_perfil: OK')
-            ->middleware('permiso:editar_perfil')->name('prueba.editar-perfil');
-    });
 });
 
-// Dominio principal
-Route::view('/', 'landing')->name('landing');
+// Panel del negocio: misma dirección, solo para su dueño y sus empleados.
+Route::domain('{subdominio}.'.$dominio)->middleware(['negocio', 'auth', 'negocio.propio'])->prefix('panel')->group(function () {
+    Route::get('/', [PanelController::class, 'negocio'])->name('panel.negocio');
 
-// US-26a: auto-registro público de negocios (sin sesión)
-Route::get('/registrar-negocio', [AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
-Route::post('/registrar-negocio', [AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
+    // US-23: equipo de trabajo del dueño
+    Route::middleware('permiso:gestionar_equipo')->group(function () {
+        Route::get('/equipo', [EquipoController::class, 'index'])->name('equipo.index');
+        Route::post('/equipo', [EquipoController::class, 'store'])->name('equipo.store');
+        Route::patch('/equipo/{empleado}/desactivar', [EquipoController::class, 'desactivar'])->name('equipo.desactivar');
+    });
+
+    Route::middleware('permiso:editar_perfil')->group(function () {
+        // US-05: perfil del negocio
+        Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
+        Route::patch('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
+
+        // US-06: categorías del menú
+        Route::prefix('categorias')->name('categorias.')->group(function () {
+            Route::get('/', [CategoriaController::class, 'index'])->name('index');
+            Route::post('/', [CategoriaController::class, 'store'])->name('store');
+            Route::put('{categoria}', [CategoriaController::class, 'update'])->name('update');
+            Route::delete('{categoria}', [CategoriaController::class, 'destroy'])->name('destroy');
+            Route::patch('{categoria}/subir', [CategoriaController::class, 'subir'])->name('subir');
+            Route::patch('{categoria}/bajar', [CategoriaController::class, 'bajar'])->name('bajar');
+        });
+
+        // US-07a y US-07b: productos del menú
+        Route::prefix('productos')->name('productos.')->group(function () {
+            Route::get('/', [ListadoProductosController::class, 'index'])->name('index');
+            Route::post('/mover', [ListadoProductosController::class, 'mover'])->name('mover');
+            Route::get('/crear', [ProductoController::class, 'create'])->name('create');
+            Route::post('/', [ProductoController::class, 'store'])->name('store');
+            Route::get('{producto}/editar', [ProductoController::class, 'edit'])->name('edit');
+            Route::put('{producto}', [ProductoController::class, 'update'])->name('update');
+            Route::delete('{producto}', [ListadoProductosController::class, 'destroy'])->name('destroy');
+        });
+
+        // US-19a: horarios de atención
+        Route::prefix('horarios')->name('horarios.')->group(function () {
+            Route::get('/', [HorarioController::class, 'index'])->name('index');
+            Route::post('/', [HorarioController::class, 'store'])->name('store');
+            Route::delete('{horario}', [HorarioController::class, 'destroy'])->name('destroy');
+        });
+
+        // US-18a: grupos de opciones de un producto
+        Route::prefix('productos/{item}/grupos')->name('grupos.')->group(function () {
+            Route::get('/', [GrupoOpcionController::class, 'index'])->name('index');
+            Route::post('/', [GrupoOpcionController::class, 'store'])->name('store');
+            Route::post('/copiar', [CopiaOpcionesController::class, 'store'])->name('copiar');
+            Route::put('{grupo}', [GrupoOpcionController::class, 'update'])->name('update');
+            Route::delete('{grupo}', [GrupoOpcionController::class, 'destroy'])->name('destroy');
+        });
+
+        // US-18b: opciones con precio dentro de un grupo
+        Route::post('grupos/{grupo}/opciones', [OpcionController::class, 'store'])->name('opciones.store');
+        Route::put('opciones/{opcion}', [OpcionController::class, 'update'])->name('opciones.update');
+        Route::delete('opciones/{opcion}', [OpcionController::class, 'destroy'])->name('opciones.destroy');
+
+        // US-19b: cierre temporal
+        Route::prefix('cierre-temporal')->name('cierre-temporal.')->group(function () {
+            Route::get('/', [CierreTemporalController::class, 'index'])->name('index');
+            Route::patch('/cerrar', [CierreTemporalController::class, 'cerrar'])->name('cerrar');
+            Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
+        });
+    });
+
+    // US-08: producto agotado o disponible
+    Route::patch('/productos/{producto}/disponibilidad', [ProductoDisponibilidadController::class, 'alternar'])
+        ->middleware('permiso:marcar_agotado')->name('productos.disponibilidad');
+
+    // Productos de una categoría (solo lectura, hasta que exista el menú)
+    Route::get('/categorias/{categoria}', [PanelController::class, 'categoria'])->name('panel.negocio.categoria');
+
+    // US-23: rutas de prueba de cada permiso, hasta que existan sus pantallas
+    Route::get('/prueba/avanzar-pedidos', fn () => 'Permiso avanzar_pedidos: OK')
+        ->middleware('permiso:avanzar_pedidos')->name('prueba.avanzar-pedidos');
+    Route::get('/prueba/marcar-agotado', fn () => 'Permiso marcar_agotado: OK')
+        ->middleware('permiso:marcar_agotado')->name('prueba.marcar-agotado');
+    Route::get('/prueba/ver-metricas', fn () => 'Permiso ver_metricas: OK')
+        ->middleware('permiso:ver_metricas')->name('prueba.ver-metricas');
+    Route::get('/prueba/editar-precios', fn () => 'Permiso editar_precios: OK')
+        ->middleware('permiso:editar_precios')->name('prueba.editar-precios');
+    Route::get('/prueba/editar-perfil', fn () => 'Permiso editar_perfil: OK')
+        ->middleware('permiso:editar_perfil')->name('prueba.editar-perfil');
+});
+
+// Dominio principal. En la dirección de un negocio estas rutas no existen.
+Route::middleware('dominio.principal')->group(function () {
+    Route::view('/', 'landing')->name('landing');
+
+    // US-26a: auto-registro público de negocios (sin sesión)
+    Route::get('/registrar-negocio', [AutoRegistroNegocioController::class, 'create'])->name('auto-registro.create');
+    Route::post('/registrar-negocio', [AutoRegistroNegocioController::class, 'store'])->name('auto-registro.store');
+});

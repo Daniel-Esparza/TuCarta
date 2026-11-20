@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Middleware\CompartirSesion;
 use App\Http\Middleware\EnsurePermiso;
 use App\Http\Middleware\ResolverNegocio;
+use App\Http\Middleware\SoloDominioPrincipal;
 use App\Http\Middleware\UsarRolDeAplicacion;
 use App\Http\Middleware\VerificarNegocioPropio;
 use App\Http\Middleware\VerificarRol;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'negocio' => ResolverNegocio::class,
+            'dominio.principal' => SoloDominioPrincipal::class,
             'negocio.propio' => VerificarNegocioPropio::class,
             'rol' => VerificarRol::class,
             // US-23: proteger rutas por permiso
