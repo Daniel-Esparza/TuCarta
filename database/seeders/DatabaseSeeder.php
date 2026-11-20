@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PermisosAdministradorSeeder::class,
             NegociosSeeder::class,
             EmpleadosSeeder::class,
+            MenusDePruebaSeeder::class,
 
         ]);
 

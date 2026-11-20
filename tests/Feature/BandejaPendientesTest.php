@@ -182,7 +182,7 @@ class BandejaPendientesTest extends TestCase
         $this->actingAs($this->admin)->patch($this->accion($negocio, 'rechazar'), ['motivo' => 'Datos incompletos']);
         auth()->logout();
 
-        $this->post('/registrar-negocio', [
+        $this->post('http://'.config('tucarta.dominio').'/registrar-negocio', [
             'nombre' => 'Otro Negocio',
             'direccion_web' => 'tacos-guero',
             'whatsapp' => '+524441234567',

@@ -15,6 +15,8 @@ class MenuPublicoController extends Controller
      */
     public function detalle(Item $item, NegocioActual $negocioActual): View
     {
+        abort_unless($item->activo, 404);
+
         $item->load('gruposOpciones.opciones');
 
         return view('menu.detalle', [
