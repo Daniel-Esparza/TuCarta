@@ -21,6 +21,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProductoDisponibilidadController;
 use App\Http\Middleware\EnsureNegocioAbierto;
 use App\Http\Controllers\GrupoOpcionController;
+use App\Http\Controllers\PedidoController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -71,6 +72,14 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
 
     // US-12b: detalle de producto
     Route::get('/producto/{item}', [MenuPublicoController::class, 'detalle'])->name('menu.detalle');
+
+
+    // US-14a: confirmación del pedido. Solo funciona si el negocio está abierto (US-19b).
+    Route::middleware(EnsureNegocioAbierto::class)->group(function () {
+        Route::get('/pedido', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
+        Route::post('/pedido', [PedidoController::class, 'store'])->name('pedido.store');
+        Route::get('/pedido/gracias', [PedidoController::class, 'gracias'])->name('pedido.gracias');
+    });
 
     // US-19b: ruta de prueba. Cuando exista el envío real de pedidos, el middleware va en esa ruta.
     Route::get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
