@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pedido;
 use App\Services\PedidoService;
+use App\Services\WhatsappPedidoService;
+use App\Support\NegocioActual;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -48,15 +51,36 @@ class PedidoController extends Controller
             ip: $request->ip(),
         );
 
-        return redirect()->route('pedido.gracias')->with('folio', $pedido->folio);
+        return redirect()->route('pedido.gracias')->with([
+            'folio' => $pedido->folio,
+            'pedido_id' => $pedido->id,
+        ]);
     }
 
-    public function gracias(): View|RedirectResponse
+    public function gracias(NegocioActual $negocioActual, WhatsappPedidoService $whatsapp): View|RedirectResponse
     {
         if (! session()->has('folio')) {
             return redirect()->route('negocio.publico');
         }
 
-        return view('pedido.gracias', ['folio' => session('folio')]);
+        $negocio = $negocioActual->negocio();
+        $pedido = null;
+
+        if (session()->has('pedido_id')) {
+            $pedido = Pedido::where('id', session('pedido_id'))
+                ->where('negocio_id', $negocio->id)
+                ->firstOrFail();
+        } else {
+            $pedido = Pedido::where('folio', session('folio'))
+                ->where('negocio_id', $negocio->id)
+                ->firstOrFail();
+        }
+
+        return view('pedido.gracias', [
+            'folio' => $pedido->folio,
+            'pedido' => $pedido,
+            'negocio' => $negocio,
+            'whatsappUrl' => $whatsapp->generarUrl($pedido, $negocio),
+        ]);
     }
 }
