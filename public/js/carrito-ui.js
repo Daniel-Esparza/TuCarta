@@ -328,9 +328,9 @@
         } else if (boton.hasAttribute('data-carrito-abrir')) {
             pintarPanel();
         } else if (boton.hasAttribute('data-carrito-cerrar')) {
-            cerrarCapas();
+            if (!evento.target.closest('.carrito-panel') || boton === evento.target) { cerrarCapas(); }
         } else if (boton.hasAttribute('data-carrito-cerrar-modal')) {
-            cerrarModal();
+            if (!evento.target.closest('.carrito-modal-caja') || boton === evento.target) { cerrarModal(); }
         }
     });
 
