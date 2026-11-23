@@ -10,6 +10,7 @@ use App\Http\Controllers\CopiaOpcionesController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ListadoProductosController;
+use App\Http\Controllers\MetricasController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\MenuPublicoController;
@@ -152,6 +153,10 @@ Route::domain('{subdominio}.'.$dominio)->middleware(['negocio', 'auth', 'negocio
             Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
         });
     });
+
+    // US-10: métricas del negocio.
+    Route::get('/metricas', [MetricasController::class, 'index'])
+        ->middleware('permiso:ver_metricas')->name('metricas.index');
 
     // US-08: producto agotado o disponible
     Route::patch('/productos/{producto}/disponibilidad', [ProductoDisponibilidadController::class, 'alternar'])

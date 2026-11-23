@@ -29,6 +29,12 @@
                 </x-tarjeta-enlace>
             @endif
 
+            @if (auth()->user()->tienePermiso(App\Enums\ClavePermiso::VerMetricas))
+                <x-tarjeta-enlace :href="route('metricas.index')" titulo="Métricas">
+                    Pedidos, estados, ticket promedio y los más vendidos.
+                </x-tarjeta-enlace>
+            @endif
+
             @if (auth()->user()->tienePermiso(App\Enums\ClavePermiso::GestionarEquipo))
                 <x-tarjeta-enlace :href="route('equipo.index')" titulo="Equipo de trabajo">
                     Da de alta y desactiva a tus empleados.
