@@ -1,0 +1,95 @@
+/*
+ * US-13: carrito del menú público. Archivo estático cargado directo
+ * desde las vistas (fuera del build de Vite); paleta aproximada al kit.
+ */
+
+.carrito-boton-agregar {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 2.5rem; padding: 0 1rem;
+    border-radius: 9999px;
+    border: 1px solid #b45f4d; background: #b45f4d; color: #fff;
+    font-weight: 700; font-size: .875rem; cursor: pointer;
+}
+.carrito-boton-agregar:hover { background: #9e4f3f; }
+.carrito-boton-bloqueado { opacity: .5; cursor: not-allowed; }
+
+.carrito-stepper { display: inline-flex; align-items: center; gap: .5rem; }
+.carrito-stepper button {
+    width: 2.25rem; height: 2.25rem; border-radius: 9999px;
+    border: 1px solid #d8cfc0; background: #fff; color: #3f3a34;
+    font-size: 1.1rem; font-weight: 700; cursor: pointer;
+}
+.carrito-stepper button:hover { background: #f4efe7; }
+.carrito-cantidad { min-width: 1.25rem; text-align: center; font-weight: 700; }
+
+.carrito-barra {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .7rem 1rem; background: #fff;
+    border-top: 1px solid #d8cfc0;
+    box-shadow: 0 -4px 12px rgba(63, 58, 52, .12);
+}
+.carrito-barra-info { font-size: .9rem; color: #3f3a34; }
+body.tucarta-con-barra { padding-bottom: 4.5rem; }
+
+.carrito-fondo { position: fixed; inset: 0; background: rgba(63, 58, 52, .45); z-index: 50; }
+
+.carrito-panel {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(24rem, 100%); z-index: 51;
+    display: flex; flex-direction: column;
+    background: #faf7f2; color: #3f3a34;
+}
+.carrito-panel-encabezado {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.25rem; border-bottom: 1px solid #d8cfc0;
+}
+.carrito-panel-encabezado h3 { font-size: 1.05rem; font-weight: 800; margin: 0; }
+.carrito-cerrar {
+    background: none; border: none; font-size: 1.5rem; line-height: 1;
+    color: #3f3a34; cursor: pointer;
+}
+.carrito-panel-lineas {
+    flex: 1; overflow-y: auto; padding: .75rem 1.25rem;
+    display: flex; flex-direction: column; gap: .75rem;
+}
+.carrito-linea {
+    background: #fff; border: 1px solid #e5ddd0; border-radius: 1rem;
+    padding: .75rem; display: flex; flex-direction: column; gap: .5rem;
+}
+.carrito-linea-nombre { margin: 0; font-weight: 700; font-size: .9rem; }
+.carrito-linea-opciones { margin: 0; font-size: .78rem; color: #6f675c; }
+.carrito-linea-precio { margin: 0; font-size: .78rem; color: #6f675c; }
+.carrito-linea-controles { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.carrito-linea-subtotal { font-weight: 800; font-size: .9rem; margin-left: auto; }
+.carrito-quitar {
+    background: none; border: none; color: #b45f4d;
+    font-size: .8rem; text-decoration: underline; cursor: pointer;
+}
+.carrito-panel-pie {
+    border-top: 1px solid #d8cfc0; padding: 1rem 1.25rem;
+    display: flex; flex-direction: column; gap: .4rem;
+}
+.carrito-total { margin: 0; font-size: 1rem; }
+.carrito-nota { margin: 0; font-size: .75rem; color: #6f675c; }
+.carrito-panel-pie .carrito-boton-agregar { width: 100%; }
+
+.carrito-modal-fondo {
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(63, 58, 52, .45);
+    display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.carrito-modal-caja {
+    background: #fff; border-radius: 1rem;
+    width: 100%; max-width: 28rem; max-height: 85vh; overflow-y: auto;
+    padding: 1.25rem; color: #3f3a34;
+}
+.carrito-modal-titulo { margin: 0 0 .75rem; font-size: 1.1rem; font-weight: 800; }
+.carrito-modal-grupo {
+    border: 1px solid #e5ddd0; border-radius: .75rem;
+    padding: .6rem .8rem; margin: 0 0 .75rem;
+}
+.carrito-modal-grupo legend { font-weight: 700; font-size: .85rem; padding: 0 .35rem; }
+.carrito-modal-opcion { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; font-size: .9rem; }
+.carrito-modal-error { color: #b45f4d; font-size: .85rem; margin: .25rem 0; }
+.carrito-modal-acciones { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .5rem; }

@@ -65,5 +65,17 @@
             </div>
         @endif
 
+        {{-- US-13: agregar al carrito (la lógica vive en carrito-ui.js) --}}
+        @if ($item->disponible_hoy)
+            <div class="pt-2" data-zona-carrito="{{ $item->id }}">
+                <button type="button" class="carrito-boton-agregar" data-carrito-agregar="{{ $item->id }}">
+                    Agregar al carrito
+                </button>
+            </div>
+        @endif
+
     </div>
+
+    {{-- US-13: datos y scripts del carrito para este producto --}}
+    <x-carrito-scripts :negocio="$negocio" :items="collect([$item])" />
 </x-layouts.app>

@@ -72,6 +72,7 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
 
     // US-12b: detalle de producto
     Route::get('/producto/{item}', [MenuPublicoController::class, 'detalle'])->name('menu.detalle');
+    Route::get('/carrito', [\App\Http\Controllers\MenuPublicoController::class, 'carrito'])->name('menu.carrito');
 
 
     // US-14a: confirmación del pedido. Solo funciona si el negocio está abierto (US-19b).
