@@ -93,3 +93,53 @@ body.tucarta-con-barra { padding-bottom: 4.5rem; }
 .carrito-modal-opcion { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; font-size: .9rem; }
 .carrito-modal-error { color: #b45f4d; font-size: .85rem; margin: .25rem 0; }
 .carrito-modal-acciones { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .5rem; }
+
+/* ============================================================
+   US-15 (diseño adaptable): objetivos táctiles de 44x44 mínimo.
+   Se añade al final para que prevalezca; no cambia colores ni
+   estados, solo el área tocable.
+   ============================================================ */
+
+/* Todo botón del carrito: por clase propia o por vivir dentro
+   de un contenedor carrito-* (barra, panel, modal, steppers). */
+button[class*="carrito"],
+[class*="carrito"] button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Refuerzo: cualquier botón con acción de carrito, aunque
+   cambien las clases (Agregar, +, -, Quitar, Ver carrito...). */
+button[data-carrito-agregar],
+button[data-carrito-menos],
+button[data-carrito-mas],
+button[data-carrito-abrir],
+button[data-carrito-quitar],
+button[data-carrito-cerrar],
+button[data-carrito-cerrar-modal] {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.carrito-cerrar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Opciones del modal: la fila completa (label) es el objetivo
+   táctil — patrón estándar label+control (WCAG) — y el control
+   visible crece a 22px con el color de la marca. */
+.carrito-modal-opcion {
+    min-height: 44px;
+    padding: .5rem 0;
+}
+
+.carrito-modal-opcion input[type="radio"],
+.carrito-modal-opcion input[type="checkbox"] {
+    width: 1.375rem;
+    height: 1.375rem;
+    flex-shrink: 0;
+    margin: 0;
+    accent-color: #b45f4d;
+}
