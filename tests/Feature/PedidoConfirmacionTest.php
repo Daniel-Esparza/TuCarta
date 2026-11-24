@@ -76,6 +76,7 @@ class PedidoConfirmacionTest extends TestCase
         return $this->post($this->url(), array_merge([
             'cliente_nombre' => 'Ana',
             'carrito' => json_encode($lineas),
+            'tipo_entrega' => 'en_sitio',
         ], $extra));
     }
 

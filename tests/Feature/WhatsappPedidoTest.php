@@ -257,6 +257,7 @@ class WhatsappPedidoTest extends TestCase
             'cliente_nombre' => 'María López',
             'notas' => 'Tocar el timbre',
             'carrito' => $carrito,
+            'tipo_entrega' => 'en_sitio',
         ]);
 
         $respuesta->assertOk();
@@ -280,6 +281,7 @@ class WhatsappPedidoTest extends TestCase
         $respuesta = $this->followingRedirects()->post($this->url('/pedido'), [
             'cliente_nombre' => 'Pedro Sánchez',
             'carrito' => $carrito,
+            'tipo_entrega' => 'en_sitio',
         ]);
 
         $respuesta->assertOk();
