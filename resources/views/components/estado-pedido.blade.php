@@ -1,0 +1,17 @@
+@props(['estado'])
+
+@php
+    // Insignia del estado de un pedido. El texto siempre se muestra: el color no es la única pista.
+    $estado = $estado instanceof App\Enums\EstadoPedido ? $estado : App\Enums\EstadoPedido::from((string) $estado);
+
+    $colores = match ($estado) {
+        App\Enums\EstadoPedido::Recibido => 'bg-brand-terracotta/10 text-brand-terracottaHover border-brand-terracotta/50',
+        App\Enums\EstadoPedido::Entregado => 'bg-brand-teal text-white border-brand-teal',
+        App\Enums\EstadoPedido::Cancelado => 'bg-brand-dark/10 text-brand-dark border-brand-dark/40',
+        default => 'bg-brand-teal/10 text-brand-teal border-brand-teal/40',
+    };
+@endphp
+
+<span {{ $attributes->merge(['class' => "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap $colores"]) }}>
+    {{ $estado->etiqueta() }}
+</span>

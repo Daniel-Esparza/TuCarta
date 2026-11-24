@@ -24,5 +24,10 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
+        // Pedidos de demostración. Las pruebas no los cargan porque cuentan sus propios pedidos.
+        if (! app()->environment('testing')) {
+            $this->call(PedidosDePruebaSeeder::class);
+        }
+
     }
 }

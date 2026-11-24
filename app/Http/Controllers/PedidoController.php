@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TipoEntrega;
 use App\Models\Pedido;
 use App\Services\PedidoService;
 use App\Services\WhatsappPedidoService;
@@ -9,6 +10,7 @@ use App\Support\NegocioActual;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PedidoController extends Controller
@@ -20,11 +22,17 @@ class PedidoController extends Controller
 
     public function store(Request $request, PedidoService $pedidos): RedirectResponse
     {
-        $request->validate([
+        $datos = $request->validate([
             'cliente_nombre' => ['required', 'string', 'max:120'],
             'notas' => ['nullable', 'string', 'max:500'],
             'carrito' => ['required', 'json'],
+            'tipo_entrega' => ['required', Rule::enum(TipoEntrega::class)],
+            'direccion_entrega' => ['nullable', 'required_if:tipo_entrega,domicilio', 'string', 'max:255'],
+            'referencias_entrega' => ['nullable', 'string', 'max:255'],
         ], [
+            'tipo_entrega.required' => 'Elige cómo quieres tu pedido.',
+            'tipo_entrega.enum' => 'El tipo de pedido no es válido.',
+            'direccion_entrega.required_if' => 'Escribe la dirección para el envío a domicilio.',
             'cliente_nombre.required' => 'Escribe tu nombre para confirmar el pedido.',
             'carrito.required' => 'Tu carrito está vacío.',
             'carrito.json' => 'No se pudo leer tu carrito. Vuelve a agregar los productos.',
@@ -49,6 +57,9 @@ class PedidoController extends Controller
             notas: $request->input('notas'),
             lineas: $lineas,
             ip: $request->ip(),
+            tipo: TipoEntrega::from($datos['tipo_entrega']),
+            direccion: $datos['direccion_entrega'] ?? null,
+            referencias: $datos['referencias_entrega'] ?? null,
         );
 
         return redirect()->route('pedido.gracias')->with([

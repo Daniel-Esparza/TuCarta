@@ -46,7 +46,7 @@ La contraseña de todas es `password`. Se inicia sesión en http://auth.tucarta.
 | `moderador@tucarta.local` | Moderador | Solo lo que le asigne el administrador; empieza sin permisos |
 | `juan@tacos-juan.tucarta.local` | Dueño de Tacos Juan | Todo el panel de su negocio |
 | `ana@sushi-ana.tucarta.local` | Dueña de Sushi Ana | Todo el panel de su negocio |
-| `marco@tacos-juan.tucarta.local` | Empleado de Tacos Juan | Avanzar pedidos y marcar agotados |
+| `marco@tacos-juan.tucarta.local` | Empleado de Tacos Juan | Ver y avanzar pedidos, y marcar agotados |
 
 Negocios de prueba, cada uno con su menú: http://tacos-juan.tucarta.localhost, http://sushi-ana.tucarta.localhost, http://pizza-nova.tucarta.localhost y http://dragon-z.tucarta.localhost.
 
@@ -109,6 +109,7 @@ Llegan en sprints posteriores: carrito y pedidos por WhatsApp (US-13 y US-14). P
 | `{subdominio}.tucarta.localhost/panel` | Dueño y empleados | Panel del negocio |
 | `{subdominio}.tucarta.localhost/panel/perfil` | Dueño | Perfil y logo |
 | `{subdominio}.tucarta.localhost/panel/categorias` | Dueño | Categorías del menú |
+| `{subdominio}.tucarta.localhost/panel/pedidos` | Dueño y empleados con permiso | Pedidos del negocio |
 | `{subdominio}.tucarta.localhost/panel/productos` | Dueño | Productos del menú |
 | `{subdominio}.tucarta.localhost/panel/horarios` | Dueño | Horarios de atención |
 | `{subdominio}.tucarta.localhost/panel/cierre-temporal` | Dueño | Cierre temporal |

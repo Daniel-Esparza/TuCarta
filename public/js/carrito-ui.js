@@ -218,8 +218,7 @@
         html += '</div><footer class="carrito-panel-pie">' +
             '<p class="carrito-total">Total estimado: <strong>' + dinero(totalEstimado()) + '</strong></p>' +
             '<p class="carrito-nota">Estimado con precios actuales; no incluye env&iacute;o. Se confirma al pedir.</p>' +
-            '<button type="button" class="carrito-boton-agregar carrito-boton-bloqueado" disabled>Realizar pedido</button>' +
-            '<p class="carrito-nota">La confirmaci&oacute;n del pedido se habilita con US-14a.</p>' +
+            '<a class="carrito-boton-agregar" href="' + escapeHtml(MENU.url_pedido) + '">Realizar pedido</a>' +
             '</footer>';
 
         panel.innerHTML = html;
@@ -328,9 +327,9 @@
         } else if (boton.hasAttribute('data-carrito-abrir')) {
             pintarPanel();
         } else if (boton.hasAttribute('data-carrito-cerrar')) {
-            cerrarCapas();
+            if (!evento.target.closest('.carrito-panel') || boton === evento.target) { cerrarCapas(); }
         } else if (boton.hasAttribute('data-carrito-cerrar-modal')) {
-            cerrarModal();
+            if (!evento.target.closest('.carrito-modal-caja') || boton === evento.target) { cerrarModal(); }
         }
     });
 

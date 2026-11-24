@@ -25,6 +25,7 @@ class EmpleadosSeeder extends Seeder
             'email' => 'marco@tacos-juan.tucarta.local',
         ]);
 
+        $empleado->otorgarPermiso(ClavePermiso::VerPedidos, $tacos);
         $empleado->otorgarPermiso(ClavePermiso::AvanzarPedidos, $tacos);
         $empleado->otorgarPermiso(ClavePermiso::MarcarAgotado, $tacos);
     }

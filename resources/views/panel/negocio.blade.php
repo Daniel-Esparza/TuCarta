@@ -7,6 +7,12 @@
         </header>
 
         <div class="grid gap-4 md:grid-cols-2">
+            @if (auth()->user()->tienePermiso(App\Enums\ClavePermiso::VerPedidos))
+                <x-tarjeta-enlace :href="route('pedidos.index')" titulo="Pedidos">
+                    Folio, fecha, productos y total de cada pedido, con filtros.
+                </x-tarjeta-enlace>
+            @endif
+
             <x-tarjeta-enlace :href="route('negocio.publico')" titulo="Ver mi página">
                 Así ven tu negocio tus clientes.
             </x-tarjeta-enlace>
@@ -26,6 +32,12 @@
                 </x-tarjeta-enlace>
                 <x-tarjeta-enlace :href="route('cierre-temporal.index')" titulo="Cierre temporal">
                     Deja de recibir pedidos cuando lo necesites.
+                </x-tarjeta-enlace>
+            @endif
+
+            @if (auth()->user()->tienePermiso(App\Enums\ClavePermiso::VerMetricas))
+                <x-tarjeta-enlace :href="route('metricas.index')" titulo="Métricas">
+                    Pedidos, estados, ticket promedio y los más vendidos.
                 </x-tarjeta-enlace>
             @endif
 

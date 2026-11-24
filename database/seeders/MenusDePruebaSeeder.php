@@ -17,7 +17,7 @@ class MenusDePruebaSeeder extends Seeder
             'descripcion' => 'Taquería familiar con tacos al pastor y de suadero.',
             'direccion' => 'Av. Carranza 815, San Luis Potosí',
             'categoria' => 'Tacos',
-        ], [[2, 3, 4, 5, 6, 7], '18:00:00', '01:00:00'], [
+        ], [[1, 2, 3, 4, 5, 6, 7], '09:00:00', '23:00:00'], [
             'Tacos' => [
                 ['Taco al pastor', 'Con piña, cebolla y cilantro.', 22],
                 ['Taco de suadero', 'En tortilla de maíz hecha a mano.', 22],

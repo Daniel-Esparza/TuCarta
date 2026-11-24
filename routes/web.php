@@ -10,6 +10,7 @@ use App\Http\Controllers\CopiaOpcionesController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ListadoProductosController;
+use App\Http\Controllers\MetricasController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\MenuPublicoController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\ProductoDisponibilidadController;
 use App\Http\Middleware\EnsureNegocioAbierto;
 use App\Http\Controllers\GrupoOpcionController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\PedidosPanelController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -152,6 +154,16 @@ Route::domain('{subdominio}.'.$dominio)->middleware(['negocio', 'auth', 'negocio
             Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
         });
     });
+
+    // US-09: bandeja de pedidos del negocio.
+    Route::middleware('permiso:ver_pedidos')->prefix('pedidos')->name('pedidos.')->group(function () {
+        Route::get('/', [PedidosPanelController::class, 'index'])->name('index');
+        Route::get('{pedido}', [PedidosPanelController::class, 'show'])->name('show');
+    });
+
+    // US-10: métricas del negocio.
+    Route::get('/metricas', [MetricasController::class, 'index'])
+        ->middleware('permiso:ver_metricas')->name('metricas.index');
 
     // US-08: producto agotado o disponible
     Route::patch('/productos/{producto}/disponibilidad', [ProductoDisponibilidadController::class, 'alternar'])
