@@ -9,6 +9,7 @@
 @php
     $payload = [
         'negocio_id' => $negocio->id,
+        'url_pedido' => route('pedido.confirmar'),
         'items' => $items->map(fn ($item) => [
             'id'             => $item->id,
             'nombre'         => $item->nombre,

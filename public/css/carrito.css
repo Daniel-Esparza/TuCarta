@@ -11,6 +11,7 @@
     font-weight: 700; font-size: .875rem; cursor: pointer;
 }
 .carrito-boton-agregar:hover { background: #9e4f3f; }
+a.carrito-boton-agregar { text-decoration: none; }
 .carrito-boton-bloqueado { opacity: .5; cursor: not-allowed; }
 
 .carrito-stepper { display: inline-flex; align-items: center; gap: .5rem; }

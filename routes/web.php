@@ -23,6 +23,7 @@ use App\Http\Controllers\ProductoDisponibilidadController;
 use App\Http\Middleware\EnsureNegocioAbierto;
 use App\Http\Controllers\GrupoOpcionController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\PedidosPanelController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -152,6 +153,12 @@ Route::domain('{subdominio}.'.$dominio)->middleware(['negocio', 'auth', 'negocio
             Route::patch('/cerrar', [CierreTemporalController::class, 'cerrar'])->name('cerrar');
             Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
         });
+    });
+
+    // US-09: bandeja de pedidos del negocio.
+    Route::middleware('permiso:ver_pedidos')->prefix('pedidos')->name('pedidos.')->group(function () {
+        Route::get('/', [PedidosPanelController::class, 'index'])->name('index');
+        Route::get('{pedido}', [PedidosPanelController::class, 'show'])->name('show');
     });
 
     // US-10: métricas del negocio.

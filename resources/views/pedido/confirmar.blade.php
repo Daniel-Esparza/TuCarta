@@ -10,6 +10,9 @@
             </div>
         @endif
 
+        {{-- Resumen del carrito guardado en este navegador --}}
+        <div id="resumen-carrito" class="space-y-2 rounded-xl border border-brand-beigeBorder bg-white/70 p-4 text-sm"></div>
+
         <form method="POST" action="{{ route('pedido.store') }}" class="space-y-4">
             @csrf
             {{-- US-13 llena este campo con el carrito guardado en el navegador --}}
@@ -60,11 +63,56 @@
                 <textarea name="notas" maxlength="500" class="mt-1 w-full rounded-lg border px-3 py-2">{{ old('notas') }}</textarea>
             </label>
 
-            <button type="submit" class="w-full rounded-lg bg-brand-terracotta px-4 py-3 font-bold text-white">
+            <button type="submit" id="boton-confirmar" class="w-full rounded-lg bg-brand-terracotta px-4 py-3 font-bold text-white">
                 Confirmar pedido
             </button>
         </form>
     </section>
+
+    <script>
+        (function () {
+            var llave = @json('tucarta.carrito.' . $negocio->id);
+            var campo = document.getElementById('carrito-input');
+            var resumen = document.getElementById('resumen-carrito');
+            var boton = document.getElementById('boton-confirmar');
+            var lineas = [];
+
+            try { lineas = JSON.parse(localStorage.getItem(llave) || '[]'); } catch (e) {}
+            if (!Array.isArray(lineas)) { lineas = []; }
+
+            function parrafo(texto, clase) {
+                var p = document.createElement('p');
+                p.textContent = texto;
+                if (clase) { p.className = clase; }
+                return p;
+            }
+
+            if (lineas.length === 0) {
+                resumen.appendChild(parrafo('Tu carrito está vacío. Vuelve al menú y agrega tus productos.'));
+                boton.disabled = true;
+                boton.classList.add('opacity-50', 'cursor-not-allowed');
+                return;
+            }
+
+            // El servidor espera item_id, cantidad y opciones; los precios los calcula él (US-14a).
+            campo.value = JSON.stringify(lineas.map(function (l) {
+                return { item_id: l.producto_id, cantidad: l.cantidad, opciones: l.opciones || [] };
+            }));
+
+            var total = 0;
+            resumen.appendChild(parrafo('Tu pedido', 'font-bold'));
+            var lista = document.createElement('ul');
+            lista.className = 'space-y-1';
+            lineas.forEach(function (l) {
+                var li = document.createElement('li');
+                li.textContent = l.cantidad + ' × ' + l.nombre + (l.opciones_texto ? ' (' + l.opciones_texto + ')' : '');
+                lista.appendChild(li);
+                total += (l.precio_unitario || 0) * l.cantidad;
+            });
+            resumen.appendChild(lista);
+            resumen.appendChild(parrafo('Total estimado: $' + total.toFixed(2) + ' (el negocio confirma el precio final)', 'font-semibold'));
+        })();
+    </script>
 
     <script>
         (function () {
