@@ -10,6 +10,7 @@ use App\Http\Controllers\CopiaOpcionesController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\ListadoProductosController;
+use App\Http\Controllers\MetricasController;
 use App\Http\Controllers\ModeradorController;
 use App\Http\Controllers\NegocioController;
 use App\Http\Controllers\MenuPublicoController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProductoDisponibilidadController;
 use App\Http\Middleware\EnsureNegocioAbierto;
 use App\Http\Controllers\GrupoOpcionController;
+use App\Http\Controllers\PedidoController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -72,6 +74,14 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
     // US-12b: detalle de producto
     Route::get('/producto/{item}', [MenuPublicoController::class, 'detalle'])->name('menu.detalle');
     Route::get('/carrito', [\App\Http\Controllers\MenuPublicoController::class, 'carrito'])->name('menu.carrito');
+
+
+    // US-14a: confirmación del pedido. Solo funciona si el negocio está abierto (US-19b).
+    Route::middleware(EnsureNegocioAbierto::class)->group(function () {
+        Route::get('/pedido', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
+        Route::post('/pedido', [PedidoController::class, 'store'])->name('pedido.store');
+        Route::get('/pedido/gracias', [PedidoController::class, 'gracias'])->name('pedido.gracias');
+    });
 
     // US-19b: ruta de prueba. Cuando exista el envío real de pedidos, el middleware va en esa ruta.
     Route::get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
@@ -143,6 +153,10 @@ Route::domain('{subdominio}.'.$dominio)->middleware(['negocio', 'auth', 'negocio
             Route::patch('/reabrir', [CierreTemporalController::class, 'reabrir'])->name('reabrir');
         });
     });
+
+    // US-10: métricas del negocio.
+    Route::get('/metricas', [MetricasController::class, 'index'])
+        ->middleware('permiso:ver_metricas')->name('metricas.index');
 
     // US-08: producto agotado o disponible
     Route::patch('/productos/{producto}/disponibilidad', [ProductoDisponibilidadController::class, 'alternar'])
