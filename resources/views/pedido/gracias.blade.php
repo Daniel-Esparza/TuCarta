@@ -2,7 +2,13 @@
     <section class="mx-auto mt-6 flex w-full max-w-md flex-col items-center gap-4 rounded-2xl border border-brand-beigeBorder bg-brand-beigeCard px-6 py-10 text-center">
         <p class="text-xs font-bold uppercase tracking-widest text-brand-terracotta">Pedido recibido</p>
         <h1 class="text-2xl font-extrabold">Folio {{ $folio }}</h1>
-        <p class="text-sm text-brand-dark/70">Guarda este folio para tu pedido.</p>
+        <p class="text-sm text-brand-dark/70">Guarda este folio para consultar tu pedido.</p>
+
+        <a id="btn-seguir-pedido"
+           href="{{ route('seguimiento.mostrar', ['folio' => $folio]) }}"
+           class="inline-flex w-full items-center justify-center rounded-xl border border-brand-terracotta px-5 py-3 text-sm font-bold text-brand-terracotta transition hover:bg-brand-terracotta/5">
+            Seguir mi pedido
+        </a>
 
         @if (! empty($whatsappUrl))
             <a id="btn-abrir-whatsapp"
