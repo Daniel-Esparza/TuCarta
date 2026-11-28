@@ -49,6 +49,12 @@ class WhatsappPedidoService
             $lineas[] = "Nota: {$pedido->notas}";
         }
 
+        $lineas[] = '';
+        $lineas[] = 'Sigue tu pedido aquí: '.route('seguimiento.mostrar', [
+            'subdominio' => $negocio->subdominio,
+            'folio' => $pedido->folio,
+        ]);
+
         return implode("\n", $lineas);
     }
 
