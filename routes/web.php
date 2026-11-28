@@ -24,6 +24,7 @@ use App\Http\Middleware\EnsureNegocioAbierto;
 use App\Http\Controllers\GrupoOpcionController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PedidosPanelController;
+use App\Http\Controllers\SeguimientoPedidoController;
 use Illuminate\Support\Facades\Route;
 
 $dominio = config('tucarta.dominio');
@@ -83,6 +84,11 @@ Route::domain('{subdominio}.'.$dominio)->middleware('negocio')->group(function (
         Route::post('/pedido', [PedidoController::class, 'store'])->name('pedido.store');
         Route::get('/pedido/gracias', [PedidoController::class, 'gracias'])->name('pedido.gracias');
     });
+
+    // US-22: consulta pública por folio (fuera de EnsureNegocioAbierto).
+    Route::get('/seguimiento', [SeguimientoPedidoController::class, 'formulario'])->name('seguimiento.formulario');
+    Route::post('/seguimiento', [SeguimientoPedidoController::class, 'buscar'])->middleware('throttle:seguimiento')->name('seguimiento.buscar');
+    Route::get('/seguimiento/{folio}', [SeguimientoPedidoController::class, 'mostrar'])->middleware('throttle:seguimiento')->name('seguimiento.mostrar');
 
     // US-19b: ruta de prueba. Cuando exista el envío real de pedidos, el middleware va en esa ruta.
     Route::get('/prueba/enviar-pedido', fn () => 'Pedido enviado (ruta de prueba)')
