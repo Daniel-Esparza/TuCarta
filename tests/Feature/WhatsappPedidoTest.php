@@ -112,6 +112,7 @@ class WhatsappPedidoTest extends TestCase
         $this->assertStringContainsString('1 x Agua de horchata ... $35', $mensaje);
         $this->assertStringContainsString('Total estimado: $235 (sin envío)', $mensaje);
         $this->assertStringContainsString('Nota: Sin picante por favor', $mensaje);
+        $this->assertStringContainsString('/seguimiento/', $mensaje);
     }
 
     public function test_el_mensaje_omite_nota_si_esta_vacia_y_no_imprime_opciones_si_no_hay(): void
